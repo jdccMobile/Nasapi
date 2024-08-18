@@ -1,4 +1,3 @@
 package com.jdccmobile.domain
 
-class MyClass {
-}
+class MyClass

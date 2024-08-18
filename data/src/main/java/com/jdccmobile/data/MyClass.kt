@@ -1,4 +1,3 @@
 package com.jdccmobile.data
 
-class MyClass {
-}
+class MyClass
