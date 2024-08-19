@@ -70,12 +70,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Koin
+    implementation("io.insert-koin:koin-android:3.4.3")
 }
 
-// ktlint configuration
-// Use with: ./gradlew --continue ktlintFormat
 ktlint {
-    android = true // Enable Android-specific linting rules
-    ignoreFailures = false // Fail the build if KtLint finds any issues
-//    disabledRules = ["final-newline", "no-wildcar÷÷÷÷d-imports", "max-line-length"] // Specify any rules to ignore
+    android = true
+    ignoreFailures = false
 }
