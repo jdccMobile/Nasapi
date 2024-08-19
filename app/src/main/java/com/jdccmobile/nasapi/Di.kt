@@ -16,13 +16,10 @@ fun Application.initDi() {
 }
 
 private val appModule = module {
-
 }
 
 private val dataModule = module {
-
 }
 
 private val domainModule = module {
-
 }
