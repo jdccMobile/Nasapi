@@ -23,4 +23,3 @@ rootProject.name = "Nasapi"
 include(":app")
 include(":data")
 include(":domain")
-include(":commons")

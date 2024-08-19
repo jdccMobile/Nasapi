@@ -11,5 +11,4 @@ java {
 }
 
 dependencies {
-    implementation(project(":commons"))
 }

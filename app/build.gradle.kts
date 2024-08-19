@@ -52,7 +52,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":commons"))
     implementation(project(":data"))
     implementation(project(":domain"))
 
