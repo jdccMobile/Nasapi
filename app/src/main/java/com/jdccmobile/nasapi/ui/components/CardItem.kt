@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
+import com.jdccmobile.nasapi.ui.theme.cardAccent
 import com.jdccmobile.nasapi.ui.theme.cardContainer
+import com.jdccmobile.nasapi.ui.theme.proportionalFontFamily
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -40,12 +42,11 @@ fun CardItem(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick(imageUrl) }
-            .background(color = cardContainer), // TODO utilizar carddefaults colors
+            .clickable { onClick(imageUrl) }, // TODO utilizar carddefaults colors
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().background(color = cardContainer),
             horizontalAlignment = Alignment.Start
         ) {
             AsyncImage(
@@ -54,27 +55,29 @@ fun CardItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(200.dp),
             )
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
+                    fontFamily = proportionalFontFamily,
                     fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
+                    color = cardAccent,
                 ),
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .basicMarquee(),
             )
             Text(
                 text = date,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray,
+                    fontSize = 14.sp,
+                    fontFamily = proportionalFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White,
                 ),
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp),
             )
         }
     }

@@ -11,11 +11,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import com.jdccmobile.nasapi.ui.theme.background
+import com.jdccmobile.nasapi.ui.theme.cardContainer
+import com.jdccmobile.nasapi.ui.theme.montserratFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,15 +34,27 @@ fun TopBarScaffold(
         containerColor = background, // TODO añadir tema
         topBar = {
             TopAppBar(
-                title = { Text(title) },
-                actions = { actions?.let { it() } }
+                title = {
+                    Text(
+                        text = title,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = montserratFontFamily,
+                        color = Color.White,
+                    )
+                },
+                actions = { actions?.let { it() } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    // TODO añadir tema
+                    containerColor = cardContainer,
+                ),
             )
-        }, modifier = modifier
+        },
+        modifier = modifier,
     ) { innerPadding ->
         Column(
             Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             content()
         }
@@ -57,23 +74,26 @@ fun TopBarWithNavigationScaffold(
             TopAppBar(
                 title = { Text(title) },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        // TODO navegar atras
-                    }) {
+                    IconButton(
+                        onClick = {
+                            // TODO navegar atras
+                        },
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 },
-                actions = { actions?.let { it() } }
+                actions = { actions?.let { it() } },
             )
-        }, modifier = modifier
+        },
+        modifier = modifier,
     ) { innerPadding ->
         Column(
             Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             content()
         }
@@ -82,16 +102,16 @@ fun TopBarWithNavigationScaffold(
 
 @Preview
 @Composable
-private fun TopBarScaffoldPreview(){
+private fun TopBarScaffoldPreview() {
     NasapiTheme {
-        TopBarScaffold("Nasapi"){}
+        TopBarScaffold("Nasapi") {}
     }
 }
 
 @Preview
 @Composable
-private fun TopBarWithNavigationScaffoldPreview(){
+private fun TopBarWithNavigationScaffoldPreview() {
     NasapiTheme {
-        TopBarWithNavigationScaffold("Favorites"){}
+        TopBarWithNavigationScaffold("Favorites") {}
     }
 }
