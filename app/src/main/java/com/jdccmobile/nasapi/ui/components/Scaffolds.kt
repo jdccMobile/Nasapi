@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -15,13 +16,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
-import com.jdccmobile.nasapi.ui.theme.background
-import com.jdccmobile.nasapi.ui.theme.cardContainer
+import com.jdccmobile.nasapi.ui.theme.bluishBlack
 import com.jdccmobile.nasapi.ui.theme.montserratFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +34,7 @@ fun TopBarScaffold(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        containerColor = background, // TODO añadir tema
+        containerColor = bluishBlack, // TODO añadir tema
         topBar = {
             TopAppBar(
                 title = {
@@ -43,23 +42,17 @@ fun TopBarScaffold(
                         text = title,
                         fontWeight = FontWeight.Bold,
                         fontFamily = montserratFontFamily,
-                        color = Color.White,
                     )
                 },
                 scrollBehavior = scrollBehavior,
                 actions = { actions?.let { it() } },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    // TODO añadir tema
-                    scrolledContainerColor = cardContainer,
-                    containerColor = cardContainer,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary,
                 ),
-//                TopAppBarDefaults.largeTopAppBarColors(
-//                    containerColor = MaterialTheme.colorScheme.primary,
-//                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
-//                    navigationIconContentColor = topAppBarElementColor,
-//                    titleContentColor = topAppBarElementColor,
-//                    actionIconContentColor= topAppBarElementColor,
-//                )
             )
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -100,6 +93,13 @@ fun TopBarWithNavigationScaffold(
                     }
                 },
                 actions = { actions?.let { it() } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary,
+                ),
             )
         },
         modifier = modifier,

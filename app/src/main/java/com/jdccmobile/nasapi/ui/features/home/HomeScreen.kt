@@ -13,8 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jdccmobile.nasapi.ui.components.CardItem
 import com.jdccmobile.nasapi.ui.components.TopBarScaffold
+import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
-import com.jdccmobile.nasapi.ui.theme.cardAccent
+import com.jdccmobile.nasapi.ui.theme.lightBlue
 import java.time.LocalDate
 
 @Composable
@@ -41,13 +42,13 @@ private fun HomeContent(
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    tint = cardAccent,
+                    tint = lightBlue,
                 )
             }
         },
     ) {
         LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = Dimens.appPadding),
         ) {
             items(astronomicEvents) { event ->
                 CardItem(
