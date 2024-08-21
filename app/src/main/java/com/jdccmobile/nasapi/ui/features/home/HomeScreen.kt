@@ -1,6 +1,5 @@
 package com.jdccmobile.nasapi.ui.features.home
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -48,8 +47,7 @@ private fun HomeContent(
         },
     ) {
         LazyColumn(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
         ) {
             items(astronomicEvents) { event ->
                 CardItem(
@@ -57,6 +55,7 @@ private fun HomeContent(
                     date = event.date.toString(),
                     imageUrl = event.imageUrl,
                     onClick = onAstronomicEventClicked,
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
         }
@@ -83,23 +82,11 @@ private fun HomeScreenDestinationPreview() {
     }
 }
 
-private val eventsMock = listOf(
+private val eventsMock = List(10) {
     AstronomicEventUi(
-        title = "Prueba",
+        title = "Prueba $it",
         description = "Descripcion",
         date = LocalDate.now(),
         imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
-    ),
-    AstronomicEventUi(
-        title = "Prueba 2",
-        description = "Descripcion",
-        date = LocalDate.now(),
-        imageUrl = "https://apod.nasa.gov/apod/image/2408/GloryFog_label.png",
-    ),
-    AstronomicEventUi(
-        title = "Prueba 3",
-        description = "Descripcion",
-        date = LocalDate.now(),
-        imageUrl = "https://apod.nasa.gov/apod/image/2408/Rhemann799_109P_24_11_92.jpg",
-    ),
-)
+    )
+}
