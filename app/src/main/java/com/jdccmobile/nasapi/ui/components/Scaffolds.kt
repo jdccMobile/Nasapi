@@ -79,7 +79,9 @@ fun TopBarWithNavigationScaffold(
         topBar = {
             TopAppBar(
                 title = { Text(title) },
-                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
+                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+                    rememberTopAppBarState(),
+                ),
                 navigationIcon = {
                     IconButton(
                         onClick = {

@@ -20,34 +20,34 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.jdccmobile.nasapi.ui.features.home.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
+import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardItem(
-    title: String,
-    date: String,
-    imageUrl: String,
-    onClick: (String) -> Unit,
+    astronomicEventUi: AstronomicEventUi,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick(imageUrl) },
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ),
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.Start,
         ) {
             AsyncImage(
-                model = imageUrl,
+                model = astronomicEventUi.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -55,7 +55,7 @@ fun CardItem(
                     .height(200.dp),
             )
             Text(
-                text = title,
+                text = astronomicEventUi.title,
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -63,24 +63,28 @@ fun CardItem(
                     .basicMarquee(),
             )
             Text(
-                text = date,
+                text = astronomicEventUi.date.toString(),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp),
             )
         }
     }
 }
-
 
 @Preview
 @Composable
 private fun CardItemPreview() {
     NasapiTheme {
         CardItem(
-            title = "Titulo",
-            date = "2024/08/11",
-            imageUrl = "",
-            onClick = {}
+            astronomicEventUi = AstronomicEventUi(
+                title = "Prueba",
+                description = "Descripcion",
+                date = LocalDate.now(),
+                imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
+            ),
+            onClick = {},
         )
     }
 }
