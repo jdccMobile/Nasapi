@@ -72,7 +72,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Koin
-    implementation("io.insert-koin:koin-android:3.4.3")
+    implementation(libs.koin.android)
+
+    // Coil
+    implementation(libs.coil)
 }
 
 ktlint {
