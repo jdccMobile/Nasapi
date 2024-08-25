@@ -13,8 +13,13 @@ class AstronomicEventRemoteDataSource(
         catch { service.getAstronomicEvent(apiKey).toDomain() }
 
 
-//    suspend fun getCityCost(startDate: LocalDate, endDate: LocalDate): Either<Throwable, List<AstronomicEventResult>> =
-//        catch { service.getAstronomicEventsPerWeek(apiKey, startDate, endDate).toDomain() }
+    suspend fun getAstronomicEventsPerWeek(
+        startDate: String,
+        endDate: String
+    ): Either<Throwable, List<AstronomicEvent>> =
+        catch {
+            service.getAstronomicEventsPerWeek(apiKey, startDate, endDate).map { it.toDomain() }
+        }
 }
 
 
@@ -22,5 +27,9 @@ private fun AstronomicEventResult.toDomain(): AstronomicEvent = AstronomicEvent(
     title = title,
     description = explanation,
     date = LocalDate.parse(date),
-    imageUrl = hdUrl
+    imageUrl = when (mediaType) {
+        "image" -> hdUrl ?: url
+        "video" -> null // TODO put gif?
+        else -> null
+    }
 )

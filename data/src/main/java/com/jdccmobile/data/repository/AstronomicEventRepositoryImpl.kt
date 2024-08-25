@@ -7,10 +7,13 @@ import com.jdccmobile.domain.repository.AstronomicEventRepository
 
 class AstronomicEventRepositoryImpl(
     private val remoteDataSource: AstronomicEventRemoteDataSource,
-): AstronomicEventRepository {
+) : AstronomicEventRepository {
     override suspend fun getAstronomicEvent(): Either<Throwable, AstronomicEvent> =
         remoteDataSource.getAstronomicEvent()
 
-//    override suspend fun getAstronomicEventsPerWeek(): Either<Throwable, List<AstronomicEvent>> =
-//        remoteDataSource.getAstronomicEventsPerWeek()
+    override suspend fun getAstronomicEventsPerWeek(
+        startDate: String,
+        endDate: String
+    ): Either<Throwable, List<AstronomicEvent>> =
+        remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate)
 }

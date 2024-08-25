@@ -1,15 +1,20 @@
 package com.jdccmobile.nasapi.ui.features.home
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,9 +31,11 @@ import java.time.LocalDate
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val astronomicalEvents by viewModel.astronomicalEvents.collectAsState()
+    val isDataLoaded by viewModel.isDataLoaded.collectAsState()
 
     HomeContent(
         astronomicEvents = astronomicalEvents,
+        isDataLoaded = isDataLoaded,
         onAstronomicEventClicked = viewModel::onAstronomicEventClicked,
         onFavoritesClicked = viewModel::onFavoritesClicked,
     )
@@ -37,6 +44,7 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 @Composable
 private fun HomeContent(
     astronomicEvents: List<AstronomicEventUi>, // TODO importar immutable list
+    isDataLoaded: Boolean,
     onAstronomicEventClicked: () -> Unit,
     onFavoritesClicked: () -> Unit,
 ) {
@@ -52,15 +60,21 @@ private fun HomeContent(
             }
         },
     ) {
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = Dimens.appPadding),
-        ) {
-            items(astronomicEvents) { event ->
-                CardItem(
-                    astronomicEventUi = event,
-                    onClick = onAstronomicEventClicked,
-                    modifier = Modifier.padding(vertical = 16.dp),
-                )
+        if (isDataLoaded) {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = Dimens.appPadding),
+            ) {
+                items(astronomicEvents) { event ->
+                    CardItem(
+                        astronomicEventUi = event,
+                        onClick = onAstronomicEventClicked,
+                        modifier = Modifier.padding(vertical = 16.dp),
+                    )
+                }
+            }
+        } else {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.size(48.dp).align(Alignment.Center))
             }
         }
     }
@@ -79,6 +93,7 @@ private fun HomeScreenDestinationPreview() {
                     imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
                 ),
             ),
+            isDataLoaded = true,
             onAstronomicEventClicked = {},
             onFavoritesClicked = {},
         )
