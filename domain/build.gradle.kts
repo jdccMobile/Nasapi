@@ -11,4 +11,6 @@ java {
 }
 
 dependencies {
+    // Either
+    implementation(libs.arrow.core)
 }

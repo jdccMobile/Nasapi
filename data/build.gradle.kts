@@ -12,4 +12,10 @@ java {
 
 dependencies {
     implementation(project(":domain"))
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    // Either
+    implementation(libs.arrow.core)
 }
