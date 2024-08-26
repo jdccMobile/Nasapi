@@ -3,6 +3,7 @@ package com.jdccmobile.domain.usecase
 import arrow.core.Either
 import arrow.core.continuations.either
 import com.jdccmobile.domain.model.AstronomicEvent
+import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 
 class GetAstronomicEvents(
@@ -11,7 +12,7 @@ class GetAstronomicEvents(
     suspend operator fun invoke(
         startDate: String,
         endDate: String,
-    ): Either<Throwable, List<AstronomicEvent>> =
+    ): Either<MyError, List<AstronomicEvent>> =
         either {
             astronomicEventRepository.getAstronomicEventsPerWeek(startDate, endDate).bind()
         }

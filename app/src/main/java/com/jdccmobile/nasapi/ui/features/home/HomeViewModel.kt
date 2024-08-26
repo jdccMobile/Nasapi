@@ -1,10 +1,10 @@
 package com.jdccmobile.nasapi.ui.features.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.usecase.GetAstronomicEvents
+import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,13 +15,17 @@ import java.time.LocalDate
 class HomeViewModel(
     private val getAstronomicEvents: GetAstronomicEvents,
 ) : ViewModel() {
-    private val _isDataLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isDataLoaded: StateFlow<Boolean> = _isDataLoaded.asStateFlow()
-
     private val _astronomicEvents: MutableStateFlow<List<AstronomicEventUi>> =
         MutableStateFlow(emptyList())
     val astronomicalEvents: StateFlow<List<AstronomicEventUi>> =
         _astronomicEvents.asStateFlow()
+
+    private val _isDataLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isDataLoaded: StateFlow<Boolean> = _isDataLoaded.asStateFlow()
+
+    // TODO ponerlo a null si hay exito si añado la opcion de recargar
+    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     fun onAstronomicEventClicked() {
         // TODO navigate to details
@@ -39,10 +43,12 @@ class HomeViewModel(
         viewModelScope.launch {
             // Todo obtener fechas mediante paging
             getAstronomicEvents("2024-08-10", "2024-08-17").fold(
-                // TODO añadir _isdataloaded a true y mostrar error
-                ifLeft = { Log.e("asd", "Error", it) },
-                ifRight = {
-                    _astronomicEvents.value = it.toUi()
+                ifLeft = { error ->
+                    _errorMessage.value = error.toMessage()
+                    _isDataLoaded.value = true
+                },
+                ifRight = { data ->
+                    _astronomicEvents.value = data.toUi()
                     _isDataLoaded.value = true
                 },
             )
