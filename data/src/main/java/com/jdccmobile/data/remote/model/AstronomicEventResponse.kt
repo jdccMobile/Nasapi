@@ -1,8 +1,8 @@
-package com.jdccmobile.data.remote
+package com.jdccmobile.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class AstronomicEventResult(
+data class AstronomicEventResponse(
     @SerializedName("copyright") val copyright: String,
     @SerializedName("date") val date: String,
     @SerializedName("explanation") val explanation: String,
