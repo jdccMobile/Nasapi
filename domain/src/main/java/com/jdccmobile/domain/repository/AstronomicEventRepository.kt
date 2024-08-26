@@ -8,6 +8,6 @@ interface AstronomicEventRepository {
 
     suspend fun getAstronomicEventsPerWeek(
         startDate: String,
-        endDate: String
+        endDate: String,
     ): Either<Throwable, List<AstronomicEvent>>
 }

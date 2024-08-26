@@ -13,7 +13,6 @@ class AstronomicEventRepositoryImpl(
 
     override suspend fun getAstronomicEventsPerWeek(
         startDate: String,
-        endDate: String
-    ): Either<Throwable, List<AstronomicEvent>> =
-        remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate)
+        endDate: String,
+    ): Either<Throwable, List<AstronomicEvent>> = remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate)
 }

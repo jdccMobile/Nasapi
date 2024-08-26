@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEvent
-import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEvents
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,10 +50,11 @@ class HomeViewModel(
     }
 }
 
+// Mirar tranformaciones de todate y totime
 data class AstronomicEventUi(
     val title: String,
     val description: String,
-    val date: LocalDate, // Mirar tranformaciones de todate y totime
+    val date: LocalDate,
     val imageUrl: String?,
 )
 

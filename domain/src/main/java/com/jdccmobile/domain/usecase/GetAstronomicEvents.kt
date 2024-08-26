@@ -6,12 +6,13 @@ import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 
 class GetAstronomicEvents(
-    private val astronomicEventRepository: AstronomicEventRepository
+    private val astronomicEventRepository: AstronomicEventRepository,
 ) {
     suspend operator fun invoke(
         startDate: String,
-        endDate: String
-    ): Either<Throwable, List<AstronomicEvent>> = either {
-        astronomicEventRepository.getAstronomicEventsPerWeek(startDate, endDate).bind()
-    }
+        endDate: String,
+    ): Either<Throwable, List<AstronomicEvent>> =
+        either {
+            astronomicEventRepository.getAstronomicEventsPerWeek(startDate, endDate).bind()
+        }
 }

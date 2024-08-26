@@ -20,7 +20,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
-import com.jdccmobile.nasapi.ui.theme.bluishBlack
 import com.jdccmobile.nasapi.ui.theme.montserratFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +33,7 @@ fun TopBarScaffold(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        containerColor = bluishBlack, // TODO añadir tema
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {

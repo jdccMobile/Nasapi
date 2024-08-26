@@ -23,6 +23,8 @@ import com.jdccmobile.nasapi.ui.components.TopBarScaffold
 import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import com.jdccmobile.nasapi.ui.theme.lightBlue
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import java.time.LocalDate
@@ -34,19 +36,20 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val isDataLoaded by viewModel.isDataLoaded.collectAsState()
 
     HomeContent(
-        astronomicEvents = astronomicalEvents,
+        astronomicEvents = astronomicalEvents.toImmutableList(),
         isDataLoaded = isDataLoaded,
         onAstronomicEventClicked = viewModel::onAstronomicEventClicked,
-        onFavoritesClicked = viewModel::onFavoritesClicked,
+//        onFavoritesClicked = viewModel::onFavoritesClicked,
     )
 }
 
 @Composable
 private fun HomeContent(
-    astronomicEvents: List<AstronomicEventUi>, // TODO importar immutable list
+    // TODO importar immutable list
+    astronomicEvents: ImmutableList<AstronomicEventUi>,
     isDataLoaded: Boolean,
     onAstronomicEventClicked: () -> Unit,
-    onFavoritesClicked: () -> Unit,
+//    onFavoritesClicked: () -> Unit,
 ) {
     TopBarScaffold(
         title = "Nasapi",
@@ -92,10 +95,10 @@ private fun HomeScreenDestinationPreview() {
                     date = LocalDate.now(),
                     imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
                 ),
-            ),
+            ).toImmutableList(),
             isDataLoaded = true,
             onAstronomicEventClicked = {},
-            onFavoritesClicked = {},
+//            onFavoritesClicked = {},
         )
     }
 }
