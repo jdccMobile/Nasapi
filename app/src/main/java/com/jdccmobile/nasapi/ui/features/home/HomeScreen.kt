@@ -1,6 +1,5 @@
 package com.jdccmobile.nasapi.ui.features.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jdccmobile.nasapi.R
+import com.jdccmobile.nasapi.ui.components.ActionIconButton
 import com.jdccmobile.nasapi.ui.components.CardItem
 import com.jdccmobile.nasapi.ui.components.TopBarScaffold
 import com.jdccmobile.nasapi.ui.theme.Dimens
@@ -54,7 +55,6 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 
 @Composable
 private fun HomeContent(
-    // TODO importar immutable list
     astronomicEvents: ImmutableList<AstronomicEventUi>,
     isDataLoaded: Boolean,
     errorMessage: String?,
@@ -64,13 +64,12 @@ private fun HomeContent(
     TopBarScaffold(
         title = "Nasapi",
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = lightBlue,
-                )
-            }
+            ActionIconButton(
+                icon = Icons.Default.Favorite,
+                onClick = {
+                    // TODO navigate to favorites
+                },
+            )
         },
     ) {
         if (isDataLoaded) {
@@ -86,35 +85,42 @@ private fun HomeContent(
                         )
                     }
                 }
-            } else {
-                Log.i("asd", errorMessage)
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_error),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(104.dp),
-                    )
-                    Text(
-                        text = errorMessage,
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.padding(top = 16.dp),
-                    )
-                }
-            }
-        } else {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .align(Alignment.Center),
-                )
-            }
-        }
+            } else InfoError(errorMessage = errorMessage)
+        } else ProgressBar()
+
+    }
+}
+
+
+@Composable
+private fun InfoError(errorMessage: String) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_error),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(104.dp),
+        )
+        Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(top = 16.dp),
+        )
+    }
+}
+
+@Composable
+private fun ProgressBar() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .size(48.dp)
+                .align(Alignment.Center),
+        )
     }
 }
 
