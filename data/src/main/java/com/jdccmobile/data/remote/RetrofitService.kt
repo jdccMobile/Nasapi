@@ -22,6 +22,7 @@ interface RetrofitService {
 
 object RetrofitServiceFactory {
     private const val BASE_URL = "https://api.nasa.gov/"
+
     fun makeRetrofitService(): RetrofitService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)

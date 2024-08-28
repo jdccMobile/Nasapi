@@ -1,8 +1,8 @@
 package com.jdccmobile.data.remote.datasource
 
 import arrow.core.Either
-import com.jdccmobile.data.remote.model.AstronomicEventResponse
 import com.jdccmobile.data.remote.RetrofitService
+import com.jdccmobile.data.remote.model.AstronomicEventResponse
 import com.jdccmobile.data.utils.toMyError
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
@@ -14,10 +14,7 @@ class AstronomicEventRemoteDataSource(
 ) {
     suspend fun getAstronomicEvent(): Either<MyError, AstronomicEvent> =
         Either.catch { service.getAstronomicEvent(apiKey).toDomain() }
-            .mapLeft {
-                println("asd1: $it")
-                it.toMyError()
-            }
+            .mapLeft { it.toMyError() }
 
     suspend fun getAstronomicEventsPerWeek(
         startDate: String,
@@ -25,10 +22,7 @@ class AstronomicEventRemoteDataSource(
     ): Either<MyError, List<AstronomicEvent>> =
         Either.catch {
             service.getAstronomicEventsPerWeek(apiKey, startDate, endDate).map { it.toDomain() }
-        }.mapLeft {
-            println("asd2: $it")
-            it.toMyError()
-        }
+        }.mapLeft { it.toMyError() }
 }
 
 private fun AstronomicEventResponse.toDomain(): AstronomicEvent =

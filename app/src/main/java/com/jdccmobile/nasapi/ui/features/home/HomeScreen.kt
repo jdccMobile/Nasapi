@@ -81,14 +81,17 @@ private fun HomeContent(
                     onLoadMoreItems = onLoadMoreItems,
                     isMoreDataLoading = isMoreDataLoading,
                 )
-            } else InfoError(errorMessage = errorMessage)
-        } else CircularProgressBar()
-
+            } else {
+                InfoError(errorMessage = errorMessage)
+            }
+        } else {
+            CircularProgressBar()
+        }
     }
 }
 
 @Composable
-private fun InfiniteScrollList( // TODO hacer generico y reusar
+private fun InfiniteScrollList(
     astronomicEvents: ImmutableList<AstronomicEventUi>,
     onAstronomicEventClicked: () -> Unit,
     onLoadMoreItems: () -> Unit,
@@ -98,21 +101,22 @@ private fun InfiniteScrollList( // TODO hacer generico y reusar
         modifier = Modifier.padding(horizontal = Dimens.appPadding),
     ) {
         itemsIndexed(astronomicEvents) { index, event ->
-            if(index == astronomicEvents.lastIndex){
-                onLoadMoreItems()
-            }
+            if (index == astronomicEvents.lastIndex)
+                {
+                    onLoadMoreItems()
+                }
             CardItem(
                 astronomicEventUi = event,
                 onClick = onAstronomicEventClicked,
                 modifier = Modifier.padding(vertical = 16.dp),
             )
         }
-        if(isMoreDataLoading){
-            item { CircularProgressBar(modifier = Modifier.padding(vertical = 16.dp)) }
-        }
+        if (isMoreDataLoading)
+            {
+                item { CircularProgressBar(modifier = Modifier.padding(vertical = 16.dp)) }
+            }
     }
 }
-
 
 @Composable
 private fun InfoError(errorMessage: String) {
