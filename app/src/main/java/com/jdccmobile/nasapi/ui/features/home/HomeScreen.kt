@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
@@ -22,10 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.ActionIconButton
-import com.jdccmobile.nasapi.ui.components.CardItem
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
+import com.jdccmobile.nasapi.ui.components.InfiniteScrollLazyColumn
 import com.jdccmobile.nasapi.ui.components.TopBarScaffold
-import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -75,9 +72,9 @@ private fun HomeContent(
     ) {
         if (!isInitialDataLoading) {
             if (errorMessage.isNullOrEmpty()) {
-                InfiniteScrollList(
-                    astronomicEvents = astronomicEvents,
-                    onAstronomicEventClicked = onAstronomicEventClicked,
+                InfiniteScrollLazyColumn(
+                    data = astronomicEvents,
+                    onItemClick = onAstronomicEventClicked,
                     onLoadMoreItems = onLoadMoreItems,
                     isMoreDataLoading = isMoreDataLoading,
                 )
@@ -87,34 +84,6 @@ private fun HomeContent(
         } else {
             CircularProgressBar()
         }
-    }
-}
-
-@Composable
-private fun InfiniteScrollList(
-    astronomicEvents: ImmutableList<AstronomicEventUi>,
-    onAstronomicEventClicked: () -> Unit,
-    onLoadMoreItems: () -> Unit,
-    isMoreDataLoading: Boolean,
-) {
-    LazyColumn(
-        modifier = Modifier.padding(horizontal = Dimens.appPadding),
-    ) {
-        itemsIndexed(astronomicEvents) { index, event ->
-            if (index == astronomicEvents.lastIndex)
-                {
-                    onLoadMoreItems()
-                }
-            CardItem(
-                astronomicEventUi = event,
-                onClick = onAstronomicEventClicked,
-                modifier = Modifier.padding(vertical = 16.dp),
-            )
-        }
-        if (isMoreDataLoading)
-            {
-                item { CircularProgressBar(modifier = Modifier.padding(vertical = 16.dp)) }
-            }
     }
 }
 

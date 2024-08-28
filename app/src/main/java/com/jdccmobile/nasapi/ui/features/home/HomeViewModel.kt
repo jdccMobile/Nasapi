@@ -36,12 +36,14 @@ class HomeViewModel(
     fun onLoadMoreItems() {
         if (!_isMoreDataLoading.value) {
             viewModelScope.launch {
+                _isMoreDataLoading.value = true
                 nextEndDateToLoad?.let { nextEndDateToLoad ->
                     getAstronomicEventsUi(
-                        startDate = nextEndDateToLoad.minusDays(7),
+                        startDate = nextEndDateToLoad.minusDays(ASTRONOMIC_EVENT_NUMBER_TO_LOAD),
                         endDate = nextEndDateToLoad,
                     )
                 }
+                _isMoreDataLoading.value = false
             }
         }
     }
@@ -58,18 +60,20 @@ class HomeViewModel(
 
     private fun getInitialEvents() {
         viewModelScope.launch {
+            _isInitialDataLoading.value = true
             getAstronomicEventsUi(
-                startDate = LocalDate.now().minusDays(7),
+                startDate = LocalDate.now().minusDays(ASTRONOMIC_EVENT_NUMBER_TO_LOAD),
                 endDate = LocalDate.now(),
             )
+            _isInitialDataLoading.value = false
         }
     }
 
+    @Suppress("MagicNumber")
     private suspend fun getAstronomicEventsUi(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
-        _isInitialDataLoading.value = true
         getAstronomicEvents(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
@@ -82,7 +86,6 @@ class HomeViewModel(
                 nextEndDateToLoad = startDate.minusDays(1)
             },
         )
-        _isInitialDataLoading.value = false
     }
 }
 
@@ -102,3 +105,5 @@ private fun List<AstronomicEvent>.toUi(): List<AstronomicEventUi> = map {
         imageUrl = it.imageUrl,
     )
 }
+
+private const val ASTRONOMIC_EVENT_NUMBER_TO_LOAD: Long = 7
