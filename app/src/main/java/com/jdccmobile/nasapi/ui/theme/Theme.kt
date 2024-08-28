@@ -16,9 +16,7 @@ private val ColorScheme = darkColorScheme(
 )
 
 @Composable
-fun NasapiTheme(
-    content: @Composable () -> Unit,
-) {
+fun NasapiTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = ColorScheme,
         typography = Typography,
