@@ -20,8 +20,11 @@ class HomeViewModel(
     val astronomicalEvents: StateFlow<List<AstronomicEventUi>> =
         _astronomicEvents.asStateFlow()
 
-    private val _isDataLoaded: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isDataLoaded: StateFlow<Boolean> = _isDataLoaded.asStateFlow()
+    private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isInitialDataLoading: StateFlow<Boolean> = _isInitialDataLoading.asStateFlow()
+
+    private val _isMoreDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isMoreDataLoading: StateFlow<Boolean> = _isMoreDataLoading.asStateFlow()
 
     // TODO ponerlo a null si hay exito si añado la opcion de recargar
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -29,6 +32,21 @@ class HomeViewModel(
 
     fun onAstronomicEventClicked() {
         // TODO navigate to details
+    }
+
+    fun onLoadMoreItems() {
+        viewModelScope.launch {
+            _isMoreDataLoading.value = true
+            getAstronomicEvents("2024-08-2", "2024-08-9").fold(
+                ifLeft = { error ->
+                    _errorMessage.value = error.toMessage()
+                },
+                ifRight = { data ->
+                    _astronomicEvents.value += data.toUi()
+                },
+            )
+            _isMoreDataLoading.value = false
+        }
     }
 
     fun onFavoritesClicked() {
@@ -41,17 +59,16 @@ class HomeViewModel(
 
     private fun getInitialEvents() {
         viewModelScope.launch {
-            // Todo obtener fechas mediante paging
+            _isInitialDataLoading.value = true
             getAstronomicEvents("2024-08-10", "2024-08-17").fold(
                 ifLeft = { error ->
                     _errorMessage.value = error.toMessage()
-                    _isDataLoaded.value = true
                 },
                 ifRight = { data ->
                     _astronomicEvents.value = data.toUi()
-                    _isDataLoaded.value = true
                 },
             )
+            _isInitialDataLoading.value = false
         }
     }
 }
