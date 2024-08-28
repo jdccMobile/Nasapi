@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.ActionIconButton
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
@@ -33,7 +34,7 @@ import java.time.LocalDate
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
-    val astronomicalEvents by viewModel.astronomicalEvents.collectAsState()
+    val astronomicalEvents by viewModel.astronomicEvents.collectAsState()
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsState()
     val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -45,7 +46,7 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
         errorMessage = errorMessage,
         onAstronomicEventClicked = viewModel::onAstronomicEventClicked,
         onLoadMoreItems = viewModel::onLoadMoreItems,
-//        onFavoritesClicked = viewModel::onFavoritesClicked,
+        onFavoritesClicked = viewModel::onFavoritesClicked,
     )
 }
 
@@ -57,7 +58,7 @@ private fun HomeContent(
     errorMessage: String?,
     onAstronomicEventClicked: () -> Unit,
     onLoadMoreItems: () -> Unit,
-//    onFavoritesClicked: () -> Unit,
+    onFavoritesClicked: () -> Unit,
 ) {
     TopBarScaffold(
         title = "Nasapi",
@@ -65,7 +66,7 @@ private fun HomeContent(
             ActionIconButton(
                 icon = Icons.Default.Favorite,
                 onClick = {
-                    // TODO navigate to favorites
+                    onFavoritesClicked()
                 },
             )
         },
@@ -115,10 +116,13 @@ private fun HomeScreenDestinationPreview() {
         HomeContent(
             astronomicEvents = listOf(
                 AstronomicEventUi(
+                    id = AstronomicEventId("1"),
                     title = "Prueba",
                     description = "Descripcion",
                     date = LocalDate.now(),
                     imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
+                    isFavorite = false,
+                    hasImage = false,
                 ),
             ).toImmutableList(),
             isInitialDataLoading = true,
@@ -126,7 +130,7 @@ private fun HomeScreenDestinationPreview() {
             onAstronomicEventClicked = {},
             onLoadMoreItems = {},
             isMoreDataLoading = false,
-//            onFavoritesClicked = {},
+            onFavoritesClicked = {},
         )
     }
 }

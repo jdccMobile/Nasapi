@@ -5,6 +5,7 @@ import com.jdccmobile.data.remote.RetrofitService
 import com.jdccmobile.data.remote.model.AstronomicEventResponse
 import com.jdccmobile.data.utils.toMyError
 import com.jdccmobile.domain.model.AstronomicEvent
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.MyError
 import java.time.LocalDate
 
@@ -27,6 +28,7 @@ class AstronomicEventRemoteDataSource(
 
 private fun AstronomicEventResponse.toDomain(): AstronomicEvent =
     AstronomicEvent(
+        id = AstronomicEventId("ae" + date.replace("-", "")),
         title = title,
         description = explanation,
         date = LocalDate.parse(date),
@@ -36,4 +38,6 @@ private fun AstronomicEventResponse.toDomain(): AstronomicEvent =
                 "video" -> null // TODO put gif?
                 else -> null
             },
+        isFavorite = false,
+        hasImage = false,
     )

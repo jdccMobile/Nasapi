@@ -2,7 +2,9 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jdccmobile.data.local.AstronomicEventLocalDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.usecase.GetAstronomicEvents
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,10 +16,11 @@ import java.time.LocalDate
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
     private val getAstronomicEvents: GetAstronomicEvents,
+    private val localDataSource: AstronomicEventLocalDataSource,
 ) : ViewModel() {
     private val _astronomicEvents: MutableStateFlow<List<AstronomicEventUi>> =
         MutableStateFlow(emptyList())
-    val astronomicalEvents: StateFlow<List<AstronomicEventUi>> =
+    val astronomicEvents: StateFlow<List<AstronomicEventUi>> =
         _astronomicEvents.asStateFlow()
 
     private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -49,8 +52,22 @@ class HomeViewModel(
     }
 
     fun onFavoritesClicked() {
-        // TODO navigate to favorites
+        viewModelScope.launch {
+            // TODO add correct logic
+            localDataSource.insertAstronomicEvent(astronomicEvents.value.first().toDomain())
+        }
     }
+
+    fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
+        id = id,
+        title = title,
+        description = description,
+        date = date,
+        imageUrl = imageUrl,
+        isFavorite = isFavorite,
+        hasImage = hasImage,
+    )
+
 
     init {
         getInitialEvents()
@@ -91,18 +108,24 @@ class HomeViewModel(
 
 // Mirar tranformaciones de todate y totime
 data class AstronomicEventUi(
+    val id: AstronomicEventId,
     val title: String,
     val description: String,
     val date: LocalDate,
     val imageUrl: String?,
+    val isFavorite: Boolean,
+    val hasImage: Boolean,
 )
 
 private fun List<AstronomicEvent>.toUi(): List<AstronomicEventUi> = map {
     AstronomicEventUi(
+        id = it.id,
         title = it.title,
         description = it.description,
         date = it.date,
         imageUrl = it.imageUrl,
+        isFavorite = it.isFavorite,
+        hasImage = it.hasImage,
     )
 }
 

@@ -1,6 +1,9 @@
 package com.jdccmobile.nasapi
 
 import android.app.Application
+import androidx.room.Room
+import com.jdccmobile.data.local.AstronomicEventDatabase
+import com.jdccmobile.data.local.AstronomicEventLocalDataSource
 import com.jdccmobile.data.remote.RetrofitService
 import com.jdccmobile.data.remote.RetrofitServiceFactory
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
@@ -34,6 +37,9 @@ private val appModule = module {
 }
 
 private val dataModule = module {
+    factoryOf(::AstronomicEventRepositoryImpl) bind AstronomicEventRepository::class
+    factoryOf(::AstronomicEventLocalDataSource)
+
     single<RetrofitService> { RetrofitServiceFactory.makeRetrofitService() }
     factory<AstronomicEventRemoteDataSource> {
         AstronomicEventRemoteDataSource(
@@ -41,7 +47,15 @@ private val dataModule = module {
             get(),
         )
     }
-    factoryOf(::AstronomicEventRepositoryImpl) bind AstronomicEventRepository::class
+
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AstronomicEventDatabase::class.java,
+            DATABASE_NAME,
+        ).build()
+    }
+    single { get<AstronomicEventDatabase>().getAstronomicEventDao() }
 }
 
 private val domainModule = module {
@@ -49,3 +63,4 @@ private val domainModule = module {
 }
 
 private const val API_KEY_NAMED = "apiKey"
+private const val DATABASE_NAME = "favorites_database"
