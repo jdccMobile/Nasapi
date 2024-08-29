@@ -19,9 +19,9 @@ class HomeViewModel(
     private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
     private val localDataSource: AstronomicEventLocalDataSource,
 ) : ViewModel() {
-    private val _astronomicEvents: MutableStateFlow<List<AstronomicEventUi>> =
-        MutableStateFlow(emptyList())
-    val astronomicEvents: StateFlow<List<AstronomicEventUi>> =
+    private val _astronomicEvents: MutableStateFlow<Set<AstronomicEventUi>> =
+        MutableStateFlow(emptySet())
+    val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
         _astronomicEvents.asStateFlow()
 
     private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -97,7 +97,7 @@ class HomeViewModel(
             },
             ifRight = { data ->
                 _astronomicEvents.value += data.reversed().toUi()
-                nextEndDateToLoad = startDate.minusDays(1)
+                nextEndDateToLoad = startDate
             },
         )
     }
