@@ -3,13 +3,13 @@ package com.jdccmobile.nasapi
 import android.app.Application
 import androidx.room.Room
 import com.jdccmobile.data.local.AstronomicEventDatabase
-import com.jdccmobile.data.local.AstronomicEventLocalDataSource
+import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.data.remote.RetrofitService
 import com.jdccmobile.data.remote.RetrofitServiceFactory
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.data.repository.AstronomicEventRepositoryImpl
 import com.jdccmobile.domain.repository.AstronomicEventRepository
-import com.jdccmobile.domain.usecase.GetAstronomicEvents
+import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -59,7 +59,7 @@ private val dataModule = module {
 }
 
 private val domainModule = module {
-    factoryOf(::GetAstronomicEvents)
+    factoryOf(::GetAstronomicEventsUseCase)
 }
 
 private const val API_KEY_NAMED = "apiKey"

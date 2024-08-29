@@ -1,11 +1,12 @@
 package com.jdccmobile.nasapi.ui.features.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.data.local.AstronomicEventLocalDataSource
+import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
-import com.jdccmobile.domain.usecase.GetAstronomicEvents
+import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,7 @@ import java.time.LocalDate
 
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
-    private val getAstronomicEvents: GetAstronomicEvents,
+    private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
     private val localDataSource: AstronomicEventLocalDataSource,
 ) : ViewModel() {
     private val _astronomicEvents: MutableStateFlow<List<AstronomicEventUi>> =
@@ -54,23 +55,20 @@ class HomeViewModel(
     fun onFavoritesClicked() {
         viewModelScope.launch {
             // TODO add correct logic
-            localDataSource.insertAstronomicEvent(astronomicEvents.value.first().toDomain())
+//            localDataSource.insertAstronomicEvent(astronomicEvents.value.first().toDomain())
+//            localDataSource.insertAstronomicEventList(astronomicEvents.value.map { it.toDomain() })
+
         }
     }
 
-    fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
-        id = id,
-        title = title,
-        description = description,
-        date = date,
-        imageUrl = imageUrl,
-        isFavorite = isFavorite,
-        hasImage = hasImage,
-    )
-
-
     init {
         getInitialEvents()
+        viewModelScope.launch {
+            localDataSource.getAstronomicEventList("2024-08-24", "2024-08-28").fold(
+                { Log.i("asd", "error: $it") },
+                { Log.i("asd", "a: ${it.size}, ${it.map { it.date }}") }
+            )
+        }
     }
 
     private var nextEndDateToLoad: LocalDate? = null
@@ -91,7 +89,7 @@ class HomeViewModel(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
-        getAstronomicEvents(
+        getAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
         ).fold(
@@ -106,7 +104,6 @@ class HomeViewModel(
     }
 }
 
-// Mirar tranformaciones de todate y totime
 data class AstronomicEventUi(
     val id: AstronomicEventId,
     val title: String,
@@ -129,4 +126,14 @@ private fun List<AstronomicEvent>.toUi(): List<AstronomicEventUi> = map {
     )
 }
 
-private const val ASTRONOMIC_EVENT_NUMBER_TO_LOAD: Long = 7
+fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
+    id = id,
+    title = title,
+    description = description,
+    date = date,
+    imageUrl = imageUrl,
+    isFavorite = isFavorite,
+    hasImage = hasImage,
+)
+
+private const val ASTRONOMIC_EVENT_NUMBER_TO_LOAD: Long = 6

@@ -1,4 +1,4 @@
-package com.jdccmobile.data.local
+package com.jdccmobile.data.local.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
