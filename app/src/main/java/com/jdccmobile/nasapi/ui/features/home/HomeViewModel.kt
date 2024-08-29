@@ -7,6 +7,8 @@ import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
+import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,10 +43,10 @@ class HomeViewModel(
         if (!_isMoreDataLoading.value) {
             viewModelScope.launch {
                 _isMoreDataLoading.value = true
-                nextEndDateToLoad?.let { nextEndDateToLoad ->
+                nextWeekToLoad?.let { nextWeekToLoad ->
                     getAstronomicEventsUi(
-                        startDate = nextEndDateToLoad.minusWeeks(1),
-                        endDate = nextEndDateToLoad,
+                        startDate = nextWeekToLoad.getFirstDayOfWeek(),
+                        endDate = nextWeekToLoad.getLastDayOfWeek(),
                     )
                 }
                 _isMoreDataLoading.value = false
@@ -53,30 +55,20 @@ class HomeViewModel(
     }
 
     fun onFavoritesClicked() {
-        viewModelScope.launch {
-            // TODO add correct logic
-//            localDataSource.insertAstronomicEvent(astronomicEvents.value.first().toDomain())
-            localDataSource.insertAstronomicEventList(astronomicEvents.value.map { it.toDomain() })
-        }
+        // TODO
     }
 
     init {
         getInitialEvents()
-//        viewModelScope.launch {
-//            localDataSource.getAstronomicEventList("2024-08-24", "2024-08-28").fold(
-//                { Log.i("asd", "error: $it") },
-//                { Log.i("asd", "a: ${it.size}, ${it.map { it.date }}") }
-//            )
-//        }
     }
 
-    private var nextEndDateToLoad: LocalDate? = null
+    private var nextWeekToLoad: LocalDate? = null
 
     private fun getInitialEvents() {
         viewModelScope.launch {
             _isInitialDataLoading.value = true
             getAstronomicEventsUi(
-                startDate = LocalDate.now().minusWeeks(1),
+                startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
             )
             _isInitialDataLoading.value = false
@@ -88,6 +80,7 @@ class HomeViewModel(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
+        Log.i("asd", "startDate: $startDate, endDate: $endDate")
         getAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
@@ -97,7 +90,7 @@ class HomeViewModel(
             },
             ifRight = { data ->
                 _astronomicEvents.value += data.reversed().toUi()
-                nextEndDateToLoad = startDate
+                nextWeekToLoad = startDate.minusWeeks(1)
             },
         )
     }

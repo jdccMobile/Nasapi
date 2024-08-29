@@ -5,9 +5,12 @@ import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
 
 interface AstronomicEventRepository {
-    suspend fun getAstronomicEvent(): Either<MyError, AstronomicEvent>
+    suspend fun getInitialAstronomicEvents(
+        startDate: String,
+        endDate: String,
+    ): Either<MyError, List<AstronomicEvent>>
 
-    suspend fun getAstronomicEventsPerWeek(
+    suspend fun getAstronomicEvents(
         startDate: String,
         endDate: String,
     ): Either<MyError, List<AstronomicEvent>>

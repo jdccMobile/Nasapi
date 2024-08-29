@@ -20,4 +20,6 @@ interface AstronomicEventDao {
     @Query("SELECT * FROM astronomic_events_table WHERE date >= :startDate AND date <= :endDate")
     suspend fun getAstronomicEventList(startDate: String, endDate: String): List<AstronomicEventDb>
 
+    @Query("SELECT COUNT(id) FROM astronomic_events_table WHERE date >= :startDate AND date <= :endDate")
+    suspend fun countEventsInWeek(startDate: String, endDate: String): Int
 }
