@@ -43,7 +43,7 @@ class HomeViewModel(
                 _isMoreDataLoading.value = true
                 nextEndDateToLoad?.let { nextEndDateToLoad ->
                     getAstronomicEventsUi(
-                        startDate = nextEndDateToLoad.minusDays(ASTRONOMIC_EVENT_NUMBER_TO_LOAD),
+                        startDate = nextEndDateToLoad.minusWeeks(1),
                         endDate = nextEndDateToLoad,
                     )
                 }
@@ -56,19 +56,18 @@ class HomeViewModel(
         viewModelScope.launch {
             // TODO add correct logic
 //            localDataSource.insertAstronomicEvent(astronomicEvents.value.first().toDomain())
-//            localDataSource.insertAstronomicEventList(astronomicEvents.value.map { it.toDomain() })
-
+            localDataSource.insertAstronomicEventList(astronomicEvents.value.map { it.toDomain() })
         }
     }
 
     init {
         getInitialEvents()
-        viewModelScope.launch {
-            localDataSource.getAstronomicEventList("2024-08-24", "2024-08-28").fold(
-                { Log.i("asd", "error: $it") },
-                { Log.i("asd", "a: ${it.size}, ${it.map { it.date }}") }
-            )
-        }
+//        viewModelScope.launch {
+//            localDataSource.getAstronomicEventList("2024-08-24", "2024-08-28").fold(
+//                { Log.i("asd", "error: $it") },
+//                { Log.i("asd", "a: ${it.size}, ${it.map { it.date }}") }
+//            )
+//        }
     }
 
     private var nextEndDateToLoad: LocalDate? = null
@@ -77,7 +76,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _isInitialDataLoading.value = true
             getAstronomicEventsUi(
-                startDate = LocalDate.now().minusDays(ASTRONOMIC_EVENT_NUMBER_TO_LOAD),
+                startDate = LocalDate.now().minusWeeks(1),
                 endDate = LocalDate.now(),
             )
             _isInitialDataLoading.value = false
