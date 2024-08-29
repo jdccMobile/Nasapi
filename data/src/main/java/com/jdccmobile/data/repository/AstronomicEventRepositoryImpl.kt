@@ -23,12 +23,14 @@ class AstronomicEventRepositoryImpl(
                 if (eventsInDb.size == EVENTS_IN_WEEK) {
                     Either.Right(eventsInDb)
                 } else {
-                    requestAndInsertEvents(startDate, endDate)
+                    requestAndInsertEvents(startDate, endDate).fold(
+                        ifLeft = { error -> Either.Left(error) },
+                        ifRight = { localDataSource.getAstronomicEventList(startDate, endDate) }
+                    )
                 }
             }
         )
 
-    // TODO ver como hago para las comprobaciones de la carga inicial
     override suspend fun getAstronomicEvents(
         startDate: String,
         endDate: String,
@@ -40,26 +42,23 @@ class AstronomicEventRepositoryImpl(
                 if (eventsInDb.size == EVENTS_IN_WEEK) {
                     Either.Right(eventsInDb)
                 } else {
-                    requestAndInsertEvents(startDate, endDate)
+                    requestAndInsertEvents(startDate, endDate).fold(
+                        ifLeft = { error -> Either.Left(error) },
+                        ifRight = { localDataSource.getAstronomicEventList(startDate, endDate) }
+                    )
                 }
             }
         )
 
-    // TODO refactorizar
     private suspend fun requestAndInsertEvents(
         startDate: String,
         endDate: String
-    ): Either<MyError, List<AstronomicEvent>> {
-        println("asd: LLAMADA A BASE DE DATOS")
+    ): Either<MyError, Unit> =
         remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).fold(
-            ifLeft = { it },
+            ifLeft = { Either.Left(it) },
             ifRight = { events -> localDataSource.insertAstronomicEventList(events) }
         )
-        return localDataSource.getAstronomicEventList(
-            startDate,
-            endDate
-        ) // TODO diria que esto no hace lo que dice el nombre de la funcion
-    }
 }
+
 
 private const val EVENTS_IN_WEEK = 7
