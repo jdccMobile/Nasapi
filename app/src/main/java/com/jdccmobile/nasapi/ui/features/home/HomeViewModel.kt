@@ -1,9 +1,13 @@
 package com.jdccmobile.nasapi.ui.features.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEvent
-import com.jdccmobile.domain.usecase.GetAstronomicEvents
+import com.jdccmobile.domain.model.AstronomicEventId
+import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
+import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +17,12 @@ import java.time.LocalDate
 
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
-    private val getAstronomicEvents: GetAstronomicEvents,
+    private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
 ) : ViewModel() {
-    private val _astronomicEvents: MutableStateFlow<List<AstronomicEventUi>> =
-        MutableStateFlow(emptyList())
-    val astronomicalEvents: StateFlow<List<AstronomicEventUi>> =
+    // TODO mirar state in (linkedin antonio leiva)
+    private val _astronomicEvents: MutableStateFlow<Set<AstronomicEventUi>> =
+        MutableStateFlow(emptySet())
+    val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
         _astronomicEvents.asStateFlow()
 
     private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -37,10 +42,10 @@ class HomeViewModel(
         if (!_isMoreDataLoading.value) {
             viewModelScope.launch {
                 _isMoreDataLoading.value = true
-                nextEndDateToLoad?.let { nextEndDateToLoad ->
+                nextWeekToLoad?.let { nextWeekToLoad ->
                     getAstronomicEventsUi(
-                        startDate = nextEndDateToLoad.minusDays(ASTRONOMIC_EVENT_NUMBER_TO_LOAD),
-                        endDate = nextEndDateToLoad,
+                        startDate = nextWeekToLoad.getFirstDayOfWeek(),
+                        endDate = nextWeekToLoad.getLastDayOfWeek(),
                     )
                 }
                 _isMoreDataLoading.value = false
@@ -49,20 +54,20 @@ class HomeViewModel(
     }
 
     fun onFavoritesClicked() {
-        // TODO navigate to favorites
+        // TODO
     }
 
     init {
         getInitialEvents()
     }
 
-    private var nextEndDateToLoad: LocalDate? = null
+    private var nextWeekToLoad: LocalDate? = null
 
     private fun getInitialEvents() {
         viewModelScope.launch {
             _isInitialDataLoading.value = true
             getAstronomicEventsUi(
-                startDate = LocalDate.now().minusDays(ASTRONOMIC_EVENT_NUMBER_TO_LOAD),
+                startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
             )
             _isInitialDataLoading.value = false
@@ -74,7 +79,8 @@ class HomeViewModel(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
-        getAstronomicEvents(
+        Log.i("asd", "startDate: $startDate, endDate: $endDate")
+        getAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
         ).fold(
@@ -83,27 +89,40 @@ class HomeViewModel(
             },
             ifRight = { data ->
                 _astronomicEvents.value += data.reversed().toUi()
-                nextEndDateToLoad = startDate.minusDays(1)
+                nextWeekToLoad = startDate.minusWeeks(1)
             },
         )
     }
 }
 
-// Mirar tranformaciones de todate y totime
 data class AstronomicEventUi(
+    val id: AstronomicEventId,
     val title: String,
     val description: String,
     val date: LocalDate,
     val imageUrl: String?,
+    val isFavorite: Boolean,
+    val hasImage: Boolean,
 )
 
 private fun List<AstronomicEvent>.toUi(): List<AstronomicEventUi> = map {
     AstronomicEventUi(
+        id = it.id,
         title = it.title,
         description = it.description,
         date = it.date,
         imageUrl = it.imageUrl,
+        isFavorite = it.isFavorite,
+        hasImage = it.hasImage,
     )
 }
 
-private const val ASTRONOMIC_EVENT_NUMBER_TO_LOAD: Long = 7
+fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
+    id = id,
+    title = title,
+    description = description,
+    date = date,
+    imageUrl = imageUrl,
+    isFavorite = isFavorite,
+    hasImage = hasImage,
+)

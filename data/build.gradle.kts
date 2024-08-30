@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.ksp)
 }
 
 java {
@@ -18,4 +19,8 @@ dependencies {
     implementation(libs.converter.gson)
     // Either
     implementation(libs.arrow.core)
+    // Room
+    implementation(libs.room.common)
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
 }

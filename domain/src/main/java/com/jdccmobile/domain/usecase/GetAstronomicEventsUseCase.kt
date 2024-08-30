@@ -6,7 +6,7 @@ import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 
-class GetAstronomicEvents(
+class GetAstronomicEventsUseCase(
     private val astronomicEventRepository: AstronomicEventRepository,
 ) {
     suspend operator fun invoke(
@@ -14,6 +14,6 @@ class GetAstronomicEvents(
         endDate: String,
     ): Either<MyError, List<AstronomicEvent>> =
         either {
-            astronomicEventRepository.getAstronomicEventsPerWeek(startDate, endDate).bind()
+            astronomicEventRepository.getAstronomicEvents(startDate, endDate).bind()
         }
 }

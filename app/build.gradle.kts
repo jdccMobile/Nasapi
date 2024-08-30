@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -95,6 +96,10 @@ dependencies {
 
     // Immutable Collection
     implementation(libs.kotlinx.immutable)
+
+    // Room
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
 }
 
 ktlint {

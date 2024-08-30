@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.features.home.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
@@ -105,10 +106,13 @@ private fun CardItemPreview() {
     NasapiTheme {
         CardItem(
             astronomicEventUi = AstronomicEventUi(
+                id = AstronomicEventId("1"),
                 title = "Prueba",
                 description = "Descripcion",
                 date = LocalDate.now(),
                 imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
+                isFavorite = false,
+                hasImage = false,
             ),
             onClick = {},
         )
