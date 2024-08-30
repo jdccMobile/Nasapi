@@ -1,6 +1,5 @@
 package com.jdccmobile.data.repository
 
-import androidx.annotation.RequiresApi
 import arrow.core.Either
 import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
@@ -14,7 +13,6 @@ class AstronomicEventRepositoryImpl(
     private val remoteDataSource: AstronomicEventRemoteDataSource,
     private val localDataSource: AstronomicEventLocalDataSource,
 ) : AstronomicEventRepository {
-    // TODO corregir
     // TODO hasta cuadno arrastar el localdate y utilizar formatter por si les da por cambiar en la api
     override suspend fun getInitialAstronomicEvents(
         startDate: String,
@@ -68,7 +66,6 @@ class AstronomicEventRepositoryImpl(
             }
         )
 
-    // TODO Crear otro metodo que obtenga fechas en especifico
     private suspend fun requestAndInsertEventsPerWeek(
         startDate: String,
         endDate: String
@@ -76,61 +73,46 @@ class AstronomicEventRepositoryImpl(
         remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).fold(
             ifLeft = { Either.Left(it) },
             ifRight = { events ->
-                println("asd: generic")
-                localDataSource.insertAstronomicEventList(events) }
+                localDataSource.insertAstronomicEventList(events)
+            }
         )
 
     private suspend fun requestAndInsertSpecificEventsPerWeek(
         startDate: String,
         endDate: String
     ): Either<MyError, Unit> {
-        val datesToSearch = generateDatesBetween(LocalDate.parse(startDate), LocalDate.parse(endDate))
-        println("asd: especificos")
+        val datesToCheck =
+            generateDatesBetween(LocalDate.parse(startDate), LocalDate.parse(endDate))
 
-        val notEventsInDb = mutableListOf<String>()
+        val notEventInDb = mutableListOf<String>()
 
-        // Iterar sobre las fechas y verificar si hay eventos en la base de datos
-        for (date in datesToSearch) {
-            when (val result = localDataSource.hasEventForDate(date.toString())) {
-                is Either.Left -> {
-                    // Manejar error de base de datos
-                    return Either.Left(result.value)
-                }
-                is Either.Right -> {
-                    if (!result.value) {
-                        // Si no hay evento en la base de datos, agregar la fecha a la lista
-                        notEventsInDb.add(date.toString())
+        for (date in datesToCheck) {
+            localDataSource.hasEventForDate(date.toString()).fold(
+                ifLeft = { return Either.Left(it) },
+                ifRight = { hasEvent ->
+                    if (!hasEvent) {
+                        notEventInDb.add(date.toString())
                     }
                 }
-            }
+            )
         }
-        println("asd: notEventsInDb: $notEventsInDb")
 
-        // Ahora puedes usar `notEventsInDb` para hacer las peticiones a la API
-        for (date in notEventsInDb) {
-            when (val result = remoteDataSource.getAstronomicEvent(date)) {
-                is Either.Left -> {
-                    // Manejar error de la API si es necesario
-                    return Either.Left(result.value)
+        for (date in notEventInDb) {
+            remoteDataSource.getAstronomicEvent(date).fold(
+                ifLeft = { return Either.Left(it) },
+                ifRight = { event ->
+                    localDataSource.insertAstronomicEvent(event).fold(
+                        ifLeft = { return Either.Left(it) },
+                        ifRight = {}
+                    )
                 }
-                is Either.Right -> {
-                    // Insertar el evento recuperado en la base de datos
-                    when (val insertResult = localDataSource.insertAstronomicEvent(result.value)) {
-                        is Either.Left -> return Either.Left(insertResult.value)  // Manejar error al insertar
-                        is Either.Right -> {}  // Continuar si la inserción fue exitosa
-                    }
-                }
-            }
+            )
         }
-        // Devolver `Either.Right(Unit)` si todo va bien
         return Either.Right(Unit)
     }
-//        remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).fold(
-//            ifLeft = { Either.Left(it) },
-//            ifRight = { events -> localDataSource.insertAstronomicEventList(events) }
-//        )
 }
 
+// TODO esto psarlo al usecase, y utilizar el first y end y el resto cuando se necesite
 // TODO crear modulo de commons para utilidades para que tengan acceso todos los modulos
 private fun generateDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
     val dates = mutableListOf<LocalDate>()
