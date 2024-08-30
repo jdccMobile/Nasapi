@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit
 
 class AstronomicEventRepositoryImpl(
     private val localDataSource: AstronomicEventLocalDataSource,
+    private val remoteDataSource: AstronomicEventRemoteDataSource,
     private val eventSyncManager: EventSyncManager
 ) : AstronomicEventRepository {
 
@@ -25,7 +26,7 @@ class AstronomicEventRepositoryImpl(
                 when (eventsInDb.size) {
                     EVENTS_IN_WEEK -> Either.Right(eventsInDb)
                     NO_EVENTS_IN_WEEK -> {
-                        eventSyncManager.syncEvents(startDate, endDate).flatMap {
+                        requestAndInsertEventsPerWeek(startDate, endDate).flatMap {
                             localDataSource.getAstronomicEventList(startDate, endDate)
                         }
                     }
@@ -38,6 +39,17 @@ class AstronomicEventRepositoryImpl(
             }
         )
     }
+
+    private suspend fun requestAndInsertEventsPerWeek(
+        startDate: String,
+        endDate: String
+    ): Either<MyError, Unit> =
+        remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).fold(
+            ifLeft = { Either.Left(it) },
+            ifRight = { events ->
+                localDataSource.insertAstronomicEventList(events)
+            }
+        )
 }
 
 private const val EVENTS_IN_WEEK = 7

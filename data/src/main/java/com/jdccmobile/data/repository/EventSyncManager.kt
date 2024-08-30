@@ -39,7 +39,6 @@ class EventSyncManager(
     }
 }
 
-// TODO esto psarlo al usecase, y utilizar el first y end y el resto cuando se necesite
 // TODO crear modulo de commons para utilidades para que tengan acceso todos los modulos
 private fun generateDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
     val dates = mutableListOf<LocalDate>()
