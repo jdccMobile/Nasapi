@@ -16,35 +16,34 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             astronomicEventDao.insertAstronomicEvent(astronomicEvent.toDb())
         }.mapLeft { it.toMyError() }
 
-    suspend fun insertAstronomicEventList(
-        astronomicEventList: List<AstronomicEvent>
-    ): Either<MyError, Unit> = catch {
-        astronomicEventDao.insertAstronomicEventList(astronomicEventList.map { it.toDb() })
-    }.mapLeft { it.toMyError() }
+    suspend fun insertAstronomicEventList(astronomicEventList: List<AstronomicEvent>): Either<MyError, Unit> =
+        catch {
+            astronomicEventDao.insertAstronomicEventList(astronomicEventList.map { it.toDb() })
+        }.mapLeft { it.toMyError() }
 
-    suspend fun getAstronomicEvent(
-        astronomicEventId: AstronomicEventId
-    ): Either<MyError, AstronomicEvent> = catch {
-        astronomicEventDao.getAstronomicEvent(astronomicEventId.value).toDomain()
-    }.mapLeft { it.toMyError() }
+    suspend fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Either<MyError, AstronomicEvent> =
+        catch {
+            astronomicEventDao.getAstronomicEvent(astronomicEventId.value).toDomain()
+        }.mapLeft { it.toMyError() }
 
     suspend fun getAstronomicEventList(
         startDate: String,
-        endDate: String
-    ): Either<MyError, List<AstronomicEvent>> = catch {
-        astronomicEventDao.getAstronomicEventList(startDate, endDate).map { it.toDomain() }
-    }.mapLeft { it.toMyError() }
+        endDate: String,
+    ): Either<MyError, List<AstronomicEvent>> =
+        catch {
+            astronomicEventDao.getAstronomicEventList(startDate, endDate).map { it.toDomain() }
+        }.mapLeft { it.toMyError() }
 
     suspend fun countEventsInWeek(
         startDate: String,
-        endDate: String
-    ): Either<MyError, Int> = catch {
-        astronomicEventDao.countEventsInWeek(startDate, endDate)
-    }.mapLeft { it.toMyError() }
+        endDate: String,
+    ): Either<MyError, Int> =
+        catch {
+            astronomicEventDao.countEventsInWeek(startDate, endDate)
+        }.mapLeft { it.toMyError() }
 
-    suspend fun hasEventForDate(
-        date: String,
-    ): Either<MyError, Boolean> = catch {
-        astronomicEventDao.hasEventForDate(date)
-    }.mapLeft { it.toMyError() }
+    suspend fun hasEventForDate(date: String): Either<MyError, Boolean> =
+        catch {
+            astronomicEventDao.hasEventForDate(date)
+        }.mapLeft { it.toMyError() }
 }

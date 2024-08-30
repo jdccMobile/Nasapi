@@ -7,18 +7,15 @@ import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 class AstronomicEventRepositoryImpl(
     private val localDataSource: AstronomicEventLocalDataSource,
     private val remoteDataSource: AstronomicEventRemoteDataSource,
-    private val eventSyncManager: EventSyncManager
+    private val eventSyncManager: EventSyncManager,
 ) : AstronomicEventRepository {
-
     override suspend fun getAstronomicEvents(
         startDate: String,
-        endDate: String
+        endDate: String,
     ): Either<MyError, List<AstronomicEvent>> {
         return localDataSource.getAstronomicEventList(startDate, endDate).fold(
             ifLeft = { Either.Left(it) },
@@ -36,19 +33,19 @@ class AstronomicEventRepositoryImpl(
                         }
                     }
                 }
-            }
+            },
         )
     }
 
     private suspend fun requestAndInsertEventsPerWeek(
         startDate: String,
-        endDate: String
+        endDate: String,
     ): Either<MyError, Unit> =
         remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).fold(
             ifLeft = { Either.Left(it) },
             ifRight = { events ->
                 localDataSource.insertAstronomicEventList(events)
-            }
+            },
         )
 }
 

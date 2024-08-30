@@ -6,11 +6,15 @@ import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.domain.model.MyError
 import java.time.LocalDate
 
+@Suppress("ReturnCount")
 class EventSyncManager(
     private val remoteDataSource: AstronomicEventRemoteDataSource,
-    private val localDataSource: AstronomicEventLocalDataSource
+    private val localDataSource: AstronomicEventLocalDataSource,
 ) {
-    suspend fun syncEvents(startDate: String, endDate: String): Either<MyError, Unit> {
+    suspend fun syncEvents(
+        startDate: String,
+        endDate: String,
+    ): Either<MyError, Unit> {
         val datesToCheck = generateDatesBetween(LocalDate.parse(startDate), LocalDate.parse(endDate))
         val datesWithoutEvents = mutableListOf<String>()
 
@@ -19,7 +23,7 @@ class EventSyncManager(
                 ifLeft = { return Either.Left(it) },
                 ifRight = { hasEvent ->
                     if (!hasEvent) datesWithoutEvents.add(date.toString())
-                }
+                },
             )
         }
 
@@ -29,9 +33,9 @@ class EventSyncManager(
                 ifRight = { event ->
                     localDataSource.insertAstronomicEvent(event).fold(
                         ifLeft = { return Either.Left(it) },
-                        ifRight = {}
+                        ifRight = {},
                     )
-                }
+                },
             )
         }
 
@@ -40,7 +44,10 @@ class EventSyncManager(
 }
 
 // TODO crear modulo de commons para utilidades para que tengan acceso todos los modulos
-private fun generateDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
+private fun generateDatesBetween(
+    startDate: LocalDate,
+    endDate: LocalDate,
+): List<LocalDate> {
     val dates = mutableListOf<LocalDate>()
     var currentDate = startDate
 

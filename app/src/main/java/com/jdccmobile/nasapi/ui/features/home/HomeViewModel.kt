@@ -3,7 +3,6 @@ package com.jdccmobile.nasapi.ui.features.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
@@ -19,7 +18,6 @@ import java.time.LocalDate
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
     private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
-    private val localDataSource: AstronomicEventLocalDataSource,
 ) : ViewModel() {
     // TODO mirar state in (linkedin antonio leiva)
     private val _astronomicEvents: MutableStateFlow<Set<AstronomicEventUi>> =
@@ -128,5 +126,3 @@ fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
     isFavorite = isFavorite,
     hasImage = hasImage,
 )
-
-private const val ASTRONOMIC_EVENT_NUMBER_TO_LOAD: Long = 6
