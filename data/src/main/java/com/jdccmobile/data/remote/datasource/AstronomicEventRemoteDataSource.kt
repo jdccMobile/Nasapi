@@ -13,8 +13,8 @@ class AstronomicEventRemoteDataSource(
     private val apiKey: String,
     private val service: RetrofitService,
 ) {
-    suspend fun getAstronomicEvent(): Either<MyError, AstronomicEvent> =
-        Either.catch { service.getAstronomicEvent(apiKey).toDomain() }
+    suspend fun getAstronomicEvent(date: String): Either<MyError, AstronomicEvent> =
+        Either.catch { service.getAstronomicEvent(apiKey, date).toDomain() }
             .mapLeft { it.toMyError() }
 
     suspend fun getAstronomicEventsPerWeek(

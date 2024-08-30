@@ -21,6 +21,7 @@ class HomeViewModel(
     private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
     private val localDataSource: AstronomicEventLocalDataSource,
 ) : ViewModel() {
+    // TODO mirar state in (linkedin antonio leiva)
     private val _astronomicEvents: MutableStateFlow<Set<AstronomicEventUi>> =
         MutableStateFlow(emptySet())
     val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =

@@ -41,4 +41,10 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
     ): Either<MyError, Int> = catch {
         astronomicEventDao.countEventsInWeek(startDate, endDate)
     }.mapLeft { it.toMyError() }
+
+    suspend fun hasEventForDate(
+        date: String,
+    ): Either<MyError, Boolean> = catch {
+        astronomicEventDao.hasEventForDate(date)
+    }.mapLeft { it.toMyError() }
 }

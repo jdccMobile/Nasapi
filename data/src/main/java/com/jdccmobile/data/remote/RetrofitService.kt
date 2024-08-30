@@ -10,6 +10,7 @@ interface RetrofitService {
     @GET("planetary/apod")
     suspend fun getAstronomicEvent(
         @Query("api_key") apiKey: String,
+        @Query("date") date: String,
     ): AstronomicEventResponse
 
     @GET("planetary/apod")
