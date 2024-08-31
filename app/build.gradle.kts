@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.jdccmobile.nasapi"
-        minSdk = 26
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -72,6 +72,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Splash screen
+    implementation(libs.androidx.splashscreen)
 
     // Koin
     implementation(libs.koin.core)
