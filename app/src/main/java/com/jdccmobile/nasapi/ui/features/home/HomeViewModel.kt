@@ -79,7 +79,6 @@ class HomeViewModel(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
-        Log.i("asd", "startDate: $startDate, endDate: $endDate")
         getAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
