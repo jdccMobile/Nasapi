@@ -1,6 +1,5 @@
 package com.jdccmobile.nasapi.ui.features.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEvent

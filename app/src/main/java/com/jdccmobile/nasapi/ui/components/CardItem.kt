@@ -2,7 +2,6 @@ package com.jdccmobile.nasapi.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,15 +37,15 @@ fun CardItem(
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = { onClick() },
+        shape = MaterialTheme.shapes.medium,
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable { onClick() },
+            .wrapContentHeight(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
-        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

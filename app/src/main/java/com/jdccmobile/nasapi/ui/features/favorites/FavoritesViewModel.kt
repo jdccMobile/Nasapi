@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class FavoritesViewModel():ViewModel() {
+class FavoritesViewModel() : ViewModel() {
     private val _favoriteEvents: MutableStateFlow<Set<AstronomicEventUi>> =
         MutableStateFlow(emptySet())
     val favoriteEvents: StateFlow<Set<AstronomicEventUi>> =
@@ -36,7 +36,7 @@ class FavoritesViewModel():ViewModel() {
     }
 }
 
-private fun getFavoriteEventsMock() = List(5){
+private fun getFavoriteEventsMock() = List(5) {
     AstronomicEventUi(
         id = AstronomicEventId("id$it"),
         title = "title$it",
