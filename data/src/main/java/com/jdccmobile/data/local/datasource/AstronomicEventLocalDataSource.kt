@@ -9,6 +9,9 @@ import com.jdccmobile.data.utils.toMyError
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.MyError
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapLatest
 
 class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicEventDao) {
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
@@ -33,6 +36,14 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
         catch {
             astronomicEventDao.getAstronomicEventList(startDate, endDate).map { it.toDomain() }
         }.mapLeft { it.toMyError() }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getFavoriteAstronomicEventList(): Flow<List<AstronomicEvent>> =
+        astronomicEventDao.getFavoriteAstronomicEventList().mapLatest { events ->
+            events.map { event ->
+                event.toDomain()
+            }
+        }
 
     suspend fun countEventsInWeek(
         startDate: String,

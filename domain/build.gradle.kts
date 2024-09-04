@@ -13,4 +13,6 @@ java {
 dependencies {
     // Either
     implementation(libs.arrow.core)
+    // Coroutines
+    implementation(libs.kotlinx.coroutines)
 }

@@ -2,9 +2,9 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.model.AstronomicEvent
-import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.model.toUi
 import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
@@ -92,35 +92,3 @@ class HomeViewModel(
         )
     }
 }
-
-data class AstronomicEventUi(
-    val id: AstronomicEventId,
-    val title: String,
-    val description: String,
-    val date: LocalDate,
-    val imageUrl: String?,
-    val isFavorite: Boolean,
-    val hasImage: Boolean,
-)
-
-private fun List<AstronomicEvent>.toUi(): List<AstronomicEventUi> = map {
-    AstronomicEventUi(
-        id = it.id,
-        title = it.title,
-        description = it.description,
-        date = it.date,
-        imageUrl = it.imageUrl,
-        isFavorite = it.isFavorite,
-        hasImage = it.hasImage,
-    )
-}
-
-fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
-    id = id,
-    title = title,
-    description = description,
-    date = date,
-    imageUrl = imageUrl,
-    isFavorite = isFavorite,
-    hasImage = hasImage,
-)

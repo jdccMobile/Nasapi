@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.jdccmobile.data.local.model.AstronomicEventDb
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AstronomicEventDao {
@@ -22,6 +23,9 @@ interface AstronomicEventDao {
         startDate: String,
         endDate: String,
     ): List<AstronomicEventDb>
+
+    @Query("SELECT * FROM astronomic_events_table WHERE is_favorite = true ORDER BY date ASC")
+    fun getFavoriteAstronomicEventList(): Flow<List<AstronomicEventDb>>
 
     @Query("SELECT COUNT(id) FROM astronomic_events_table WHERE date >= :startDate AND date <= :endDate")
     suspend fun countEventsInWeek(

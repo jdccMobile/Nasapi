@@ -17,6 +17,8 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+// Coroutines
+    implementation(libs.kotlinx.coroutines)
     // Either
     implementation(libs.arrow.core)
     // Room

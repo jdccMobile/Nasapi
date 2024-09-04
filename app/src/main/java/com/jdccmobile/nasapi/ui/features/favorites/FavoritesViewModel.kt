@@ -2,48 +2,35 @@ package com.jdccmobile.nasapi.ui.features.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.model.AstronomicEventId
-import com.jdccmobile.nasapi.ui.features.home.AstronomicEventUi
+import com.jdccmobile.domain.repository.AstronomicEventRepository
+import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.model.toUi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import java.time.LocalDate
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 
-class FavoritesViewModel() : ViewModel() {
-    private val _favoriteEvents: MutableStateFlow<Set<AstronomicEventUi>> =
-        MutableStateFlow(emptySet())
-    val favoriteEvents: StateFlow<Set<AstronomicEventUi>> =
-        _favoriteEvents.asStateFlow()
+@OptIn(ExperimentalCoroutinesApi::class)
+class FavoritesViewModel(
+    astronomicEventRepository: AstronomicEventRepository,
+) : ViewModel() {
 
-    private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isInitialDataLoading: StateFlow<Boolean> = _isInitialDataLoading.asStateFlow()
+    private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
 
-    fun onFaoriteEventClicked() {
+    val favoriteEvents: StateFlow<List<AstronomicEventUi>> =
+        astronomicEventRepository.getFavoriteAstronomicEvents()
+            .mapLatest { it.toUi() }
+            .onStart { _isDataLoading.value = true }
+            .onCompletion { _isDataLoading.value = false }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    fun onFavoriteEventClicked() {
         // TODO navigate to details
     }
-
-    init {
-        getFavoriteEvents()
-    }
-
-    private fun getFavoriteEvents() {
-        viewModelScope.launch {
-            _isInitialDataLoading.value = true
-            _favoriteEvents.value = getFavoriteEventsMock() // TODO invoke usecase
-            _isInitialDataLoading.value = false
-        }
-    }
 }
-
-private fun getFavoriteEventsMock() = List(5) {
-    AstronomicEventUi(
-        id = AstronomicEventId("id$it"),
-        title = "title$it",
-        description = "description$it",
-        date = LocalDate.now(),
-        hasImage = true,
-        imageUrl = null,
-        isFavorite = true,
-    )
-}.toSet()

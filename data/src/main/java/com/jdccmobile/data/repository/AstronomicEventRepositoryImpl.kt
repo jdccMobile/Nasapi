@@ -7,6 +7,7 @@ import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
+import kotlinx.coroutines.flow.Flow
 
 class AstronomicEventRepositoryImpl(
     private val localDataSource: AstronomicEventLocalDataSource,
@@ -27,6 +28,7 @@ class AstronomicEventRepositoryImpl(
                             localDataSource.getAstronomicEventList(startDate, endDate)
                         }
                     }
+
                     else -> {
                         eventSyncManager.syncEvents(startDate, endDate).flatMap {
                             localDataSource.getAstronomicEventList(startDate, endDate)
@@ -36,6 +38,9 @@ class AstronomicEventRepositoryImpl(
             },
         )
     }
+
+    override fun getFavoriteAstronomicEvents(): Flow<List<AstronomicEvent>> =
+        localDataSource.getFavoriteAstronomicEventList()
 
     private suspend fun requestAndInsertEventsPerWeek(
         startDate: String,
