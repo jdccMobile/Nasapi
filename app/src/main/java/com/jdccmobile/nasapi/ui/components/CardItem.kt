@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
-import com.jdccmobile.nasapi.ui.features.home.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import java.time.LocalDate
 

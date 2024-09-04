@@ -16,8 +16,9 @@ import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.CardItem
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
+import com.jdccmobile.nasapi.ui.components.InfoError
 import com.jdccmobile.nasapi.ui.components.TopBarWithNavigationScaffold
-import com.jdccmobile.nasapi.ui.features.home.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -30,38 +31,45 @@ import java.time.LocalDate
 @Composable
 fun FavoritesScreen(viewModel: FavoritesViewModel = koinViewModel()) {
     val favoriteEvents by viewModel.favoriteEvents.collectAsState()
-    val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsState()
+    val isDataLoading by viewModel.isDataLoading.collectAsState()
     FavoritesContent(
         favoriteEvents = favoriteEvents.toImmutableList(),
-        isInitialDataLoading = isInitialDataLoading,
-        onFavoriteEventClicked = viewModel::onFaoriteEventClicked,
+        isDataLoading = isDataLoading,
+        onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
     )
 }
 
 @Composable
 private fun FavoritesContent(
     favoriteEvents: ImmutableList<AstronomicEventUi>,
-    isInitialDataLoading: Boolean,
+    isDataLoading: Boolean,
     onFavoriteEventClicked: () -> Unit,
 ) {
     TopBarWithNavigationScaffold(
         title = stringResource(R.string.favorites),
     ) {
-        if (!isInitialDataLoading) {
-            // TODO añadir info sobre error con un flow
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(Dimens.appPadding),
-            ) {
-                items(favoriteEvents) { event ->
-                    CardItem(
-                        astronomicEventUi = event,
-                        onClick = { onFavoriteEventClicked() },
-                    )
+        if (isDataLoading) {
+            if (favoriteEvents.isNotEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(Dimens.appPadding),
+                ) {
+                    items(favoriteEvents) { event ->
+                        CardItem(
+                            astronomicEventUi = event,
+                            onClick = { onFavoriteEventClicked() },
+                        )
+                    }
                 }
+            } else {
+                InfoError(
+                    errorMessage = "There are not favorites",
+                    errorIconId = R.drawable.ic_star_off_outline,
+                )
             }
+
         } else {
             CircularProgressBar()
         }
@@ -84,7 +92,7 @@ private fun HomeScreenDestinationPreview() {
                     hasImage = false,
                 ),
             ).toImmutableList(),
-            isInitialDataLoading = false,
+            isDataLoading = false,
             onFavoriteEventClicked = {},
         )
     }
