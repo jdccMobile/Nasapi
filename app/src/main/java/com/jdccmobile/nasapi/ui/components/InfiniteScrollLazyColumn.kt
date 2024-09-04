@@ -1,5 +1,6 @@
 package com.jdccmobile.nasapi.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,7 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.jdccmobile.nasapi.ui.features.home.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.Dimens
 import kotlinx.collections.immutable.ImmutableList
 
@@ -20,9 +21,10 @@ fun InfiniteScrollLazyColumn(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = Dimens.appPadding),
+            .padding(Dimens.appPadding),
     ) {
         itemsIndexed(data) { index, event ->
             if (index == data.lastIndex) {
@@ -31,7 +33,6 @@ fun InfiniteScrollLazyColumn(
             CardItem(
                 astronomicEventUi = event,
                 onClick = onItemClick,
-                modifier = Modifier.padding(vertical = 16.dp),
             )
         }
         if (isMoreDataLoading) {
