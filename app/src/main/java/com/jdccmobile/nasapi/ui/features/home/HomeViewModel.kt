@@ -3,26 +3,32 @@ package com.jdccmobile.nasapi.ui.features.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
 import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
-    private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
+    private val requestAstronomicEventsUseCase: RequestAstronomicEventsUseCase,
+    getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
 ) : ViewModel() {
-    // TODO mirar state in (linkedin antonio leiva)
-    private val _astronomicEvents: MutableStateFlow<Set<AstronomicEventUi>> =
-        MutableStateFlow(emptySet())
     val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
-        _astronomicEvents.asStateFlow()
+        getAstronomicEventsUseCase().mapLatest { events ->
+            events.toUi().toSet()
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
     private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitialDataLoading: StateFlow<Boolean> = _isInitialDataLoading.asStateFlow()
@@ -42,7 +48,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _isMoreDataLoading.value = true
                 nextWeekToLoad?.let { nextWeekToLoad ->
-                    getAstronomicEventsUi(
+                    requestAstronomicEvents(
                         startDate = nextWeekToLoad.getFirstDayOfWeek(),
                         endDate = nextWeekToLoad.getLastDayOfWeek(),
                     )
@@ -57,15 +63,15 @@ class HomeViewModel(
     }
 
     init {
-        getInitialEvents()
+        requestInitialEvents()
     }
 
     private var nextWeekToLoad: LocalDate? = null
 
-    private fun getInitialEvents() {
+    private fun requestInitialEvents() {
         viewModelScope.launch {
             _isInitialDataLoading.value = true
-            getAstronomicEventsUi(
+            requestAstronomicEvents(
                 startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
             )
@@ -74,21 +80,18 @@ class HomeViewModel(
     }
 
     @Suppress("MagicNumber")
-    private suspend fun getAstronomicEventsUi(
+    private suspend fun requestAstronomicEvents(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
-        getAstronomicEventsUseCase(
+        requestAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
         ).fold(
             ifLeft = { error ->
                 _errorMessage.value = error.toMessage()
             },
-            ifRight = { data ->
-                _astronomicEvents.value += data.reversed().toUi()
-                nextWeekToLoad = startDate.minusWeeks(1)
-            },
+            ifRight = { nextWeekToLoad = startDate.minusWeeks(1) },
         )
     }
 }

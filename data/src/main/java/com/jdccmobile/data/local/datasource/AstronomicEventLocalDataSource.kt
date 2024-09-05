@@ -13,7 +13,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicEventDao) {
+    fun astronomicEvents(
+    ): Flow<List<AstronomicEvent>> =
+        astronomicEventDao.getAllAstronomicEventList()
+            .mapLatest { events -> events.map { it.toDomain() } }
+
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
         catch {
             astronomicEventDao.insertAstronomicEvent(astronomicEvent.toDb())
@@ -38,7 +44,7 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
         }.mapLeft { it.toMyError() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getFavoriteAstronomicEventList(): Flow<List<AstronomicEvent>> =
+    fun favoriteAstronomicEvents(): Flow<List<AstronomicEvent>> =
         astronomicEventDao.getFavoriteAstronomicEventList().mapLatest { events ->
             events.map { event ->
                 event.toDomain()

@@ -8,50 +8,35 @@ import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 class AstronomicEventRepositoryImpl(
     private val localDataSource: AstronomicEventLocalDataSource,
-    private val remoteDataSource: AstronomicEventRemoteDataSource,
-    private val eventSyncManager: EventSyncManager,
+    private val requestAndInsertEventsPerWeek: RequestAndInsertEventsPerWeek,
 ) : AstronomicEventRepository {
-    override suspend fun getAstronomicEvents(
+
+    override val astronomicEvents: Flow<List<AstronomicEvent>> =
+        localDataSource.astronomicEvents()
+
+    override val favoriteAstronomicEvents: Flow<List<AstronomicEvent>> =
+        localDataSource.favoriteAstronomicEvents()
+
+    override suspend fun requestAstronomicEvents(
         startDate: String,
         endDate: String,
-    ): Either<MyError, List<AstronomicEvent>> {
-        return localDataSource.getAstronomicEventList(startDate, endDate).fold(
-            ifLeft = { Either.Left(it) },
+    ): Either<MyError, Unit> {
+        localDataSource.getAstronomicEventList(startDate, endDate).fold(
+            ifLeft = { return Either.Left(it) },
             ifRight = { eventsInDb ->
                 when (eventsInDb.size) {
-                    EVENTS_IN_WEEK -> Either.Right(eventsInDb)
-                    NO_EVENTS_IN_WEEK -> {
-                        requestAndInsertEventsPerWeek(startDate, endDate).flatMap {
-                            localDataSource.getAstronomicEventList(startDate, endDate)
-                        }
-                    }
-
-                    else -> {
-                        eventSyncManager.syncEvents(startDate, endDate).flatMap {
-                            localDataSource.getAstronomicEventList(startDate, endDate)
-                        }
-                    }
+                    EVENTS_IN_WEEK -> {}
+                    NO_EVENTS_IN_WEEK -> requestAndInsertEventsPerWeek.allEvents(startDate, endDate)
+                    else -> requestAndInsertEventsPerWeek.specificEvents(startDate, endDate)
                 }
             },
         )
+        return Either.Right(Unit)
     }
-
-    override fun getFavoriteAstronomicEvents(): Flow<List<AstronomicEvent>> =
-        localDataSource.getFavoriteAstronomicEventList()
-
-    private suspend fun requestAndInsertEventsPerWeek(
-        startDate: String,
-        endDate: String,
-    ): Either<MyError, Unit> =
-        remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).fold(
-            ifLeft = { Either.Left(it) },
-            ifRight = { events ->
-                localDataSource.insertAstronomicEventList(events)
-            },
-        )
 }
 
 private const val EVENTS_IN_WEEK = 7

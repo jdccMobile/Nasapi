@@ -8,9 +8,11 @@ import com.jdccmobile.data.remote.RetrofitService
 import com.jdccmobile.data.remote.RetrofitServiceFactory
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.data.repository.AstronomicEventRepositoryImpl
-import com.jdccmobile.data.repository.EventSyncManager
+import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -42,7 +44,7 @@ private val appModule = module {
 private val dataModule = module {
     factoryOf(::AstronomicEventRepositoryImpl) bind AstronomicEventRepository::class
     factoryOf(::AstronomicEventLocalDataSource)
-    factoryOf(::EventSyncManager)
+    factoryOf(::RequestAndInsertEventsPerWeek)
 
     single<RetrofitService> { RetrofitServiceFactory.makeRetrofitService() }
     factory<AstronomicEventRemoteDataSource> {
@@ -63,7 +65,9 @@ private val dataModule = module {
 }
 
 private val domainModule = module {
+    factoryOf(::RequestAstronomicEventsUseCase)
     factoryOf(::GetAstronomicEventsUseCase)
+    factoryOf(::GetFavoriteAstronomicEventsUseCase)
 }
 
 private const val API_KEY_NAMED = "apiKey"

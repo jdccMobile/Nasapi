@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AstronomicEventDao {
+    @Query("SELECT * FROM astronomic_events_table ORDER BY date DESC")
+    fun getAllAstronomicEventList(
+    ): Flow<List<AstronomicEventDb>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEventDb)
 
