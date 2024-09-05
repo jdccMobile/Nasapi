@@ -17,10 +17,10 @@ class AstronomicEventRepositoryImpl(
 
     // todo get???
     override val astronomicEvents: Flow<List<AstronomicEvent>> =
-        localDataSource.getAllAstronomicEventList()
+        localDataSource.astronomicEvents()
 
     override val favoriteAstronomicEvents: Flow<List<AstronomicEvent>> =
-        localDataSource.getFavoriteAstronomicEventList()
+        localDataSource.favoriteAstronomicEvents()
 
     override suspend fun requestAstronomicEvents(
         startDate: String,
