@@ -14,7 +14,12 @@ class AstronomicEventRepositoryImpl(
     private val remoteDataSource: AstronomicEventRemoteDataSource,
     private val eventSyncManager: EventSyncManager,
 ) : AstronomicEventRepository {
-    override suspend fun getAstronomicEvents(
+
+    // todo get???
+    override val astronomicEvents: Flow<List<AstronomicEvent>> =
+        localDataSource.getAllAstronomicEventList()
+
+    override suspend fun requestAstronomicEvents(
         startDate: String,
         endDate: String,
     ): Either<MyError, List<AstronomicEvent>> {

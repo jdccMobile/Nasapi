@@ -6,7 +6,9 @@ import com.jdccmobile.domain.model.MyError
 import kotlinx.coroutines.flow.Flow
 
 interface AstronomicEventRepository {
-    suspend fun getAstronomicEvents(
+    val astronomicEvents: Flow<List<AstronomicEvent>>
+
+    suspend fun requestAstronomicEvents(
         startDate: String,
         endDate: String,
     ): Either<MyError, List<AstronomicEvent>>
