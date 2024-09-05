@@ -9,6 +9,7 @@ import com.jdccmobile.nasapi.ui.model.toUi
 import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,17 +20,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
     private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
     repository: AstronomicEventRepository,
 ) : ViewModel() {
-    // TODO mirar state in (linkedin antonio leiva)
-//    private val _astronomicEvents: MutableStateFlow<Set<AstronomicEventUi>> =
-//        MutableStateFlow(emptySet())
-//    val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
-//        _astronomicEvents.asStateFlow()
-
     val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
         repository.astronomicEvents.mapLatest { events ->
             events.toUi().toSet()

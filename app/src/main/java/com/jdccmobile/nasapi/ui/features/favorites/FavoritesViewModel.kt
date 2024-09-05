@@ -24,7 +24,7 @@ class FavoritesViewModel(
     val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
 
     val favoriteEvents: StateFlow<List<AstronomicEventUi>> =
-        astronomicEventRepository.getFavoriteAstronomicEvents()
+        astronomicEventRepository.favoriteAstronomicEvents
             .mapLatest { it.toUi() }
             .onStart { _isDataLoading.value = true }
             .onCompletion { _isDataLoading.value = false }
