@@ -12,6 +12,6 @@ interface AstronomicEventRepository {
     suspend fun requestAstronomicEvents(
         startDate: String,
         endDate: String,
-    ): Either<MyError, List<AstronomicEvent>>
+    ): Either<MyError, Unit>
 
 }

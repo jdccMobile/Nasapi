@@ -8,7 +8,7 @@ import com.jdccmobile.data.remote.RetrofitService
 import com.jdccmobile.data.remote.RetrofitServiceFactory
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.data.repository.AstronomicEventRepositoryImpl
-import com.jdccmobile.data.repository.EventSyncManager
+import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
@@ -42,7 +42,7 @@ private val appModule = module {
 private val dataModule = module {
     factoryOf(::AstronomicEventRepositoryImpl) bind AstronomicEventRepository::class
     factoryOf(::AstronomicEventLocalDataSource)
-    factoryOf(::EventSyncManager)
+    factoryOf(::RequestAndInsertEventsPerWeek)
 
     single<RetrofitService> { RetrofitServiceFactory.makeRetrofitService() }
     factory<AstronomicEventRemoteDataSource> {

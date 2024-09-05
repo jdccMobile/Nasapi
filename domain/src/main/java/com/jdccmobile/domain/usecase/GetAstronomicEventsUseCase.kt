@@ -12,8 +12,7 @@ class GetAstronomicEventsUseCase(
     suspend operator fun invoke(
         startDate: String,
         endDate: String,
-    ): Either<MyError, List<AstronomicEvent>> =
-        either {
-            astronomicEventRepository.requestAstronomicEvents(startDate, endDate).bind()
-        }
+    ): Either<MyError, Unit> = either {
+        astronomicEventRepository.requestAstronomicEvents(startDate, endDate).bind()
+    }
 }

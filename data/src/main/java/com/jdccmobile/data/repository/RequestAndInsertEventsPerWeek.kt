@@ -1,17 +1,25 @@
 package com.jdccmobile.data.repository
 
 import arrow.core.Either
+import arrow.core.flatMap
 import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.domain.model.MyError
 import java.time.LocalDate
 
-@Suppress("ReturnCount")
-class EventSyncManager(
+class RequestAndInsertEventsPerWeek(
     private val remoteDataSource: AstronomicEventRemoteDataSource,
     private val localDataSource: AstronomicEventLocalDataSource,
 ) {
-    suspend fun syncEvents(
+    suspend fun allEvents(
+        startDate: String,
+        endDate: String,
+    ): Either<MyError, Unit> =
+        remoteDataSource.getAstronomicEventsPerWeek(startDate, endDate).flatMap { events ->
+            localDataSource.insertAstronomicEventList(events)
+        }
+
+    suspend fun specificEvents(
         startDate: String,
         endDate: String,
     ): Either<MyError, Unit> {
@@ -43,7 +51,6 @@ class EventSyncManager(
     }
 }
 
-// TODO crear modulo de commons para utilidades para que tengan acceso todos los modulos
 private fun generateDatesBetween(
     startDate: LocalDate,
     endDate: LocalDate,
