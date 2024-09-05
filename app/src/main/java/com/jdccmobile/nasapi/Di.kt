@@ -11,6 +11,8 @@ import com.jdccmobile.data.repository.AstronomicEventRepositoryImpl
 import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -63,7 +65,9 @@ private val dataModule = module {
 }
 
 private val domainModule = module {
+    factoryOf(::RequestAstronomicEventsUseCase)
     factoryOf(::GetAstronomicEventsUseCase)
+    factoryOf(::GetFavoriteAstronomicEventsUseCase)
 }
 
 private const val API_KEY_NAMED = "apiKey"

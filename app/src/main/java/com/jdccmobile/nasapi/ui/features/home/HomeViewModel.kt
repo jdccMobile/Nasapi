@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
 import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
@@ -22,11 +23,11 @@ import java.time.LocalDate
 @OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
-    private val getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
-    repository: AstronomicEventRepository,
+    private val requestAstronomicEventsUseCase: RequestAstronomicEventsUseCase,
+    getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
 ) : ViewModel() {
     val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
-        repository.astronomicEvents.mapLatest { events ->
+        getAstronomicEventsUseCase().mapLatest { events ->
             events.toUi().toSet()
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
@@ -84,7 +85,7 @@ class HomeViewModel(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
-        getAstronomicEventsUseCase(
+        requestAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
         ).fold(
