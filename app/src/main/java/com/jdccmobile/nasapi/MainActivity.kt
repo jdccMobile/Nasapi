@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.jdccmobile.nasapi.ui.features.favorites.FavoritesScreen
 import com.jdccmobile.nasapi.ui.features.home.HomeScreen
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 

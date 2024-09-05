@@ -69,7 +69,6 @@ private fun FavoritesContent(
                     errorIconId = R.drawable.ic_star_off_outline,
                 )
             }
-
         } else {
             CircularProgressBar()
         }

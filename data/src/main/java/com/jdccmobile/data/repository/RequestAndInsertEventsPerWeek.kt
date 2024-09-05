@@ -19,6 +19,7 @@ class RequestAndInsertEventsPerWeek(
             localDataSource.insertAstronomicEventList(events)
         }
 
+    @Suppress("ReturnCount")
     suspend fun specificEvents(
         startDate: String,
         endDate: String,

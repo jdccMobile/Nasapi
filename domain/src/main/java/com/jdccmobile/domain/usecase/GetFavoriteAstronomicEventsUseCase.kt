@@ -7,6 +7,5 @@ import kotlinx.coroutines.flow.Flow
 class GetFavoriteAstronomicEventsUseCase(
     private val astronomicEventRepository: AstronomicEventRepository,
 ) {
-    operator fun invoke(): Flow<List<AstronomicEvent>> =
-        astronomicEventRepository.favoriteAstronomicEvents
+    operator fun invoke(): Flow<List<AstronomicEvent>> = astronomicEventRepository.favoriteAstronomicEvents
 }

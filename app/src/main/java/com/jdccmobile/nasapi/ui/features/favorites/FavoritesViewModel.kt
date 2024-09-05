@@ -2,7 +2,6 @@ package com.jdccmobile.nasapi.ui.features.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
@@ -18,9 +17,8 @@ import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FavoritesViewModel(
-    getFavoriteAstronomicEventsUseCase: GetFavoriteAstronomicEventsUseCase
+    getFavoriteAstronomicEventsUseCase: GetFavoriteAstronomicEventsUseCase,
 ) : ViewModel() {
-
     private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
 

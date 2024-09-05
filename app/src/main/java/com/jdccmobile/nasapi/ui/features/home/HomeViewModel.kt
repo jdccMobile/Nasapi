@@ -2,7 +2,6 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
@@ -49,7 +48,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _isMoreDataLoading.value = true
                 nextWeekToLoad?.let { nextWeekToLoad ->
-                    getAstronomicEventsUi(
+                    requestAstronomicEvents(
                         startDate = nextWeekToLoad.getFirstDayOfWeek(),
                         endDate = nextWeekToLoad.getLastDayOfWeek(),
                     )
@@ -72,7 +71,7 @@ class HomeViewModel(
     private fun requestInitialEvents() {
         viewModelScope.launch {
             _isInitialDataLoading.value = true
-            getAstronomicEventsUi(
+            requestAstronomicEvents(
                 startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
             )
@@ -81,7 +80,7 @@ class HomeViewModel(
     }
 
     @Suppress("MagicNumber")
-    private suspend fun getAstronomicEventsUi(
+    private suspend fun requestAstronomicEvents(
         startDate: LocalDate,
         endDate: LocalDate,
     ) {
@@ -92,10 +91,7 @@ class HomeViewModel(
             ifLeft = { error ->
                 _errorMessage.value = error.toMessage()
             },
-            ifRight = { data ->
-//                _astronomicEvents.value += data.reversed().toUi()
-                nextWeekToLoad = startDate.minusWeeks(1)
-            },
+            ifRight = { nextWeekToLoad = startDate.minusWeeks(1) },
         )
     }
 }

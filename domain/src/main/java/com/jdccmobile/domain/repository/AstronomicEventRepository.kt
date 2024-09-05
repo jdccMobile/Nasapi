@@ -13,5 +13,4 @@ interface AstronomicEventRepository {
         startDate: String,
         endDate: String,
     ): Either<MyError, Unit>
-
 }
