@@ -13,6 +13,7 @@ import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
+import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -39,6 +40,7 @@ private val appModule = module {
 
     viewModelOf(::HomeViewModel)
     viewModelOf(::FavoritesViewModel)
+    viewModelOf(::DetailsViewModel)
 }
 
 private val dataModule = module {

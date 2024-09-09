@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
 import com.jdccmobile.domain.model.AstronomicEvent
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,9 @@ class AstronomicEventRepositoryImpl(
 
     override val favoriteAstronomicEvents: Flow<List<AstronomicEvent>> =
         localDataSource.favoriteAstronomicEvents()
+
+    override fun getAstronomicEventDetails(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
+        localDataSource.getAstronomicEvent(astronomicEventId)
 
     override suspend fun requestAstronomicEvents(
         startDate: String,

@@ -15,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,46 +25,73 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
+import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.DetailsScaffold
 import com.jdccmobile.nasapi.ui.components.IconAndMessageInfo
 import com.jdccmobile.nasapi.ui.components.ImageWithErrorIcon
+import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
+import java.time.LocalDate
 
 // TODO quitar status bar
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
-fun DetailsScreen() {
-    DetailsContent()
+fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
+    val astronomicEvent by viewModel.astronomicEvent.collectAsState()
+    val isDataLoading by viewModel.isDataLoading.collectAsState()
+    DetailsContent(
+        astronomicEvent = astronomicEvent,
+        isDataLoading = isDataLoading,
+    )
 }
 
 @Suppress("MagicNumber")
 @Composable
-private fun DetailsContent() {
+private fun DetailsContent(
+    astronomicEvent: AstronomicEventUi?,
+    isDataLoading: Boolean,
+) {
     val listState = rememberLazyListState()
     val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
 
     DetailsScaffold(
         showFab = showFab,
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy((-48).dp),
-            state = listState,
-        ) {
-            item {
-                ImageWithErrorIcon(
-                    imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
-                    modifier = Modifier.height(400.dp),
-                )
+        if (isDataLoading)
+            {
+                CircularProgressBar()
+            } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy((-48).dp),
+                state = listState,
+            ) {
+                item {
+                    ImageWithErrorIcon(
+                        imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
+                        modifier = Modifier.height(400.dp),
+                    )
+                }
+                item {
+                    astronomicEvent?.let {
+                        EventDescription(
+                            astronomicEvent = it,
+                        )
+                    }
+                }
             }
-            item { EventDescription() }
         }
     }
 }
 
 @Composable
 private fun EventDescription(
+    astronomicEvent: AstronomicEventUi,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -78,21 +106,21 @@ private fun EventDescription(
                 .padding(24.dp),
         ) {
             Text(
-                text = "Animation: Perseid Meteor Shower",
+                text = astronomicEvent.title,
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 8.dp),
             )
 
             Text(
-                text = "2024-08-10",
+                text = astronomicEvent.date.toString(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 24.dp),
             )
 
             Text(
-                text = "But the Trifid Nebula is too faint to be seen by the unaided eye. Over 75 hours of image data captured under dark night skies was used to create this stunning telescopic view.  Watch: The Perseid Meteor Shower",
+                text = astronomicEvent.description,
                 style = MaterialTheme.typography.bodySmall,
             )
 
@@ -122,6 +150,17 @@ fun MyPhotos(modifier: Modifier = Modifier) {
 @Composable
 private fun HomeScreenDestinationPreview() {
     NasapiTheme {
-        DetailsContent()
+        DetailsContent(
+            astronomicEvent = AstronomicEventUi(
+                id = AstronomicEventId("1"),
+                title = "Prueba",
+                description = "Descripcion",
+                date = LocalDate.now(),
+                imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
+                isFavorite = false,
+                hasImage = false,
+            ),
+            isDataLoading = false,
+        )
     }
 }

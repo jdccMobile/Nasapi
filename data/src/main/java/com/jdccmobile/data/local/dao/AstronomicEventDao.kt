@@ -20,7 +20,7 @@ interface AstronomicEventDao {
     suspend fun insertAstronomicEventList(astronomicEventList: List<AstronomicEventDb>)
 
     @Query("SELECT * FROM astronomic_events_table WHERE id = :astronomicEventId")
-    suspend fun getAstronomicEvent(astronomicEventId: String): AstronomicEventDb
+    fun getAstronomicEvent(astronomicEventId: String): Flow<AstronomicEventDb>
 
     @Query("SELECT * FROM astronomic_events_table WHERE date >= :startDate AND date <= :endDate ORDER BY date ASC")
     suspend fun getAstronomicEventList(

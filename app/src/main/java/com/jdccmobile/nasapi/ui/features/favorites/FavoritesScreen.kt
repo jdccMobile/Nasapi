@@ -48,7 +48,7 @@ private fun FavoritesContent(
     TopBarWithNavigationScaffold(
         title = stringResource(R.string.favorites),
     ) {
-        if (isDataLoading) {
+        if (!isDataLoading) {
             if (favoriteEvents.isNotEmpty()) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),

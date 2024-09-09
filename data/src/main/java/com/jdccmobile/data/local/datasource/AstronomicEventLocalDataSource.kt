@@ -30,10 +30,9 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             astronomicEventDao.insertAstronomicEventList(astronomicEventList.map { it.toDb() })
         }.mapLeft { it.toMyError() }
 
-    suspend fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Either<MyError, AstronomicEvent> =
-        catch {
-            astronomicEventDao.getAstronomicEvent(astronomicEventId.value).toDomain()
-        }.mapLeft { it.toMyError() }
+    fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
+        astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
+
 
     suspend fun getAstronomicEventList(
         startDate: String,
@@ -43,7 +42,6 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             astronomicEventDao.getAstronomicEventList(startDate, endDate).map { it.toDomain() }
         }.mapLeft { it.toMyError() }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun favoriteAstronomicEvents(): Flow<List<AstronomicEvent>> =
         astronomicEventDao.getFavoriteAstronomicEventList().mapLatest { events ->
             events.map { event ->
