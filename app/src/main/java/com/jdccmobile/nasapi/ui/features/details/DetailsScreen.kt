@@ -37,6 +37,7 @@ fun DetailsScreen() {
     DetailsContent()
 }
 
+@Suppress("MagicNumber")
 @Composable
 private fun DetailsContent() {
     val listState = rememberLazyListState()
