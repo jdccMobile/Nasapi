@@ -66,7 +66,7 @@ private fun FavoritesContent(
             } else {
                 InfoError(
                     errorMessage = "There are not favorites",
-                    errorIconId = R.drawable.ic_star_off_outline,
+                    errorIconId = R.drawable.ic_heart_broken,
                 )
             }
         } else {

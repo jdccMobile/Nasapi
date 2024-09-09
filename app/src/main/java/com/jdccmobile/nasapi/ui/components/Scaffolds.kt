@@ -1,11 +1,18 @@
 package com.jdccmobile.nasapi.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -15,11 +22,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.jdccmobile.nasapi.R
+import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import com.jdccmobile.nasapi.ui.theme.lightBlue
 import com.jdccmobile.nasapi.ui.theme.montserratFontFamily
@@ -113,6 +126,67 @@ fun TopBarWithNavigationScaffold(
                 .fillMaxSize(),
         ) {
             content()
+        }
+    }
+}
+
+@Composable
+fun DetailsScaffold(
+    showFab: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surface,
+        floatingActionButton = {
+            Column {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
+                    onClick = {
+                        // TODO abrir camara
+                    },
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add_a_photo),
+                        contentDescription = null,
+                    )
+                }
+                Spacer(modifier = Modifier.padding(8.dp))
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
+                    onClick = {
+                        // TODO guardar como favorito
+                    },
+                ) {
+                    Icon(imageVector = Icons.Outlined.FavoriteBorder, contentDescription = null)
+                }
+            }
+        },
+    ) { innerPadding ->
+        Box(
+            Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
+            content()
+            AnimatedVisibility(visible = showFab, enter = fadeIn(), exit = fadeOut()) {
+                FloatingActionButton(
+                    onClick = {},
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(Dimens.appPadding),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                    )
+                }
+            }
         }
     }
 }

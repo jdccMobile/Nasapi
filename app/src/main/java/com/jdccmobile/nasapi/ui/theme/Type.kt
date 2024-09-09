@@ -17,6 +17,13 @@ val montserratFontFamily = FontFamily(
 )
 
 val Typography = Typography(
+    titleMedium = TextStyle(
+        fontFamily = proportionalFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp,
+    ),
     titleSmall = TextStyle(
         fontFamily = proportionalFontFamily,
         fontWeight = FontWeight.Bold,
@@ -24,8 +31,15 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
     ),
-    bodySmall = TextStyle(
+    bodyMedium = TextStyle(
         fontFamily = proportionalFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp,
+    ),
+    bodySmall = TextStyle(
+        fontFamily = montserratFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 24.sp,
