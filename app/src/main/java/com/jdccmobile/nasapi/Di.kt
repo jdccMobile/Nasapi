@@ -13,6 +13,7 @@ import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
@@ -70,6 +71,7 @@ private val domainModule = module {
     factoryOf(::RequestAstronomicEventsUseCase)
     factoryOf(::GetAstronomicEventsUseCase)
     factoryOf(::GetFavoriteAstronomicEventsUseCase)
+    factoryOf(::SwitchEventFavoriteStatusUseCase)
 }
 
 private const val API_KEY_NAMED = "apiKey"

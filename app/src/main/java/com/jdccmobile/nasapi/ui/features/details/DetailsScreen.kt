@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,8 +40,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import java.time.LocalDate
 
-// TODO quitar status bar
-
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
@@ -47,6 +48,8 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
+        onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
+        onTakePhotoFabClicked = viewModel::onTakePhotoFabClicked,
     )
 }
 
@@ -55,17 +58,26 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
 private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,
     isDataLoading: Boolean,
+    onFavoriteFabClicked: () -> Unit,
+    onTakePhotoFabClicked: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
+    val favoriteFabIcon = if (astronomicEvent?.isFavorite == true) {
+        Icons.Outlined.Favorite
+    } else {
+        Icons.Outlined.FavoriteBorder
+    }
 
     DetailsScaffold(
         showFab = showFab,
+        favoriteFabIcon = favoriteFabIcon,
+        onFavoriteFabClicked = onFavoriteFabClicked,
+        onTakePhotoFabClicked = onTakePhotoFabClicked,
     ) {
-        if (isDataLoading)
-            {
-                CircularProgressBar()
-            } else {
+        if (isDataLoading) {
+            CircularProgressBar()
+        } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy((-48).dp),
@@ -161,6 +173,8 @@ private fun HomeScreenDestinationPreview() {
                 hasImage = false,
             ),
             isDataLoading = false,
+            onFavoriteFabClicked = {},
+            onTakePhotoFabClicked = {},
         )
     }
 }

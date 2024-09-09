@@ -133,7 +133,10 @@ fun TopBarWithNavigationScaffold(
 @Composable
 fun DetailsScaffold(
     showFab: Boolean,
+    favoriteFabIcon: ImageVector,
     modifier: Modifier = Modifier,
+    onFavoriteFabClicked: () -> Unit,
+    onTakePhotoFabClicked: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -144,9 +147,7 @@ fun DetailsScaffold(
                 FloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = Color.White,
-                    onClick = {
-                        // TODO abrir camara
-                    },
+                    onClick = { onTakePhotoFabClicked() },
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add_a_photo),
@@ -157,11 +158,9 @@ fun DetailsScaffold(
                 FloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = Color.White,
-                    onClick = {
-                        // TODO guardar como favorito
-                    },
+                    onClick = { onFavoriteFabClicked() },
                 ) {
-                    Icon(imageVector = Icons.Outlined.FavoriteBorder, contentDescription = null)
+                    Icon(imageVector = favoriteFabIcon, contentDescription = null)
                 }
             }
         },

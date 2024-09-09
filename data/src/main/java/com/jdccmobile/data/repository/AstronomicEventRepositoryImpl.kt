@@ -41,6 +41,13 @@ class AstronomicEventRepositoryImpl(
         )
         return Either.Right(Unit)
     }
+
+    override suspend fun switchFavoriteStatus(
+        astronomicEvent: AstronomicEvent
+    ): Either<MyError, Unit> = localDataSource.switchFavoriteStatus(astronomicEvent).map {
+        println("asd asd")
+    }
+
 }
 
 private const val EVENTS_IN_WEEK = 7

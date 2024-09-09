@@ -39,4 +39,5 @@ interface AstronomicEventDao {
 
     @Query("SELECT COUNT(id) = 1 FROM astronomic_events_table WHERE date = :date")
     suspend fun hasEventForDate(date: String): Boolean
+
 }

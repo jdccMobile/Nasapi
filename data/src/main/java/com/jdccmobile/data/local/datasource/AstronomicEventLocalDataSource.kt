@@ -15,10 +15,20 @@ import kotlinx.coroutines.flow.mapLatest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicEventDao) {
-    fun astronomicEvents(
-    ): Flow<List<AstronomicEvent>> =
+    fun astronomicEvents(): Flow<List<AstronomicEvent>> =
         astronomicEventDao.getAllAstronomicEventList()
             .mapLatest { events -> events.map { it.toDomain() } }
+
+    fun favoriteAstronomicEvents(): Flow<List<AstronomicEvent>> =
+        astronomicEventDao.getFavoriteAstronomicEventList().mapLatest { events ->
+            events.map { event ->
+                event.toDomain()
+            }
+        }
+
+
+    fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
+        astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
 
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
         catch {
@@ -30,10 +40,6 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             astronomicEventDao.insertAstronomicEventList(astronomicEventList.map { it.toDb() })
         }.mapLeft { it.toMyError() }
 
-    fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
-        astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
-
-
     suspend fun getAstronomicEventList(
         startDate: String,
         endDate: String,
@@ -42,23 +48,14 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             astronomicEventDao.getAstronomicEventList(startDate, endDate).map { it.toDomain() }
         }.mapLeft { it.toMyError() }
 
-    fun favoriteAstronomicEvents(): Flow<List<AstronomicEvent>> =
-        astronomicEventDao.getFavoriteAstronomicEventList().mapLatest { events ->
-            events.map { event ->
-                event.toDomain()
-            }
-        }
-
-    suspend fun countEventsInWeek(
-        startDate: String,
-        endDate: String,
-    ): Either<MyError, Int> =
-        catch {
-            astronomicEventDao.countEventsInWeek(startDate, endDate)
-        }.mapLeft { it.toMyError() }
-
     suspend fun hasEventForDate(date: String): Either<MyError, Boolean> =
         catch {
             astronomicEventDao.hasEventForDate(date)
+        }.mapLeft { it.toMyError() }
+
+    suspend fun switchFavoriteStatus(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
+        catch {
+            val event = astronomicEvent.copy(isFavorite = !astronomicEvent.isFavorite)
+            astronomicEventDao.insertAstronomicEvent(event.toDb())
         }.mapLeft { it.toMyError() }
 }
