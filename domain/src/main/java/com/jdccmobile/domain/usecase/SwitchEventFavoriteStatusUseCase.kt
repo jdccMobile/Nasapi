@@ -4,7 +4,6 @@ import arrow.core.Either
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.repository.AstronomicEventRepository
-import kotlinx.coroutines.flow.Flow
 
 class SwitchEventFavoriteStatusUseCase(
     private val astronomicEventRepository: AstronomicEventRepository,

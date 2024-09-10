@@ -17,7 +17,5 @@ interface AstronomicEventRepository {
         endDate: String,
     ): Either<MyError, Unit>
 
-    suspend fun switchFavoriteStatus(
-        astronomicEvent: AstronomicEvent
-    ): Either<MyError, Unit>
+    suspend fun switchFavoriteStatus(astronomicEvent: AstronomicEvent): Either<MyError, Unit>
 }
