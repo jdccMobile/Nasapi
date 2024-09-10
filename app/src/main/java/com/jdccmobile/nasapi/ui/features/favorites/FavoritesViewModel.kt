@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
@@ -24,9 +23,11 @@ class FavoritesViewModel(
 
     val favoriteEvents: StateFlow<List<AstronomicEventUi>> =
         getFavoriteAstronomicEventsUseCase()
-            .mapLatest { it.toUi() }
+            .mapLatest {
+                _isDataLoading.value = false
+                it.toUi()
+            }
             .onStart { _isDataLoading.value = true }
-            .onCompletion { _isDataLoading.value = false }
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun onFavoriteEventClicked() {

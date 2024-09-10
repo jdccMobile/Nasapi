@@ -39,10 +39,6 @@ class HomeViewModel(
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    fun onAstronomicEventClicked() {
-        // TODO navigate to details
-    }
-
     fun onLoadMoreItems() {
         if (!_isMoreDataLoading.value) {
             viewModelScope.launch {
@@ -58,8 +54,12 @@ class HomeViewModel(
         }
     }
 
+    fun onAstronomicEventClicked() {
+        // TODO navigate to details
+    }
+
     fun onFavoritesClicked() {
-        // TODO
+        // TODO navigate to favorites
     }
 
     init {

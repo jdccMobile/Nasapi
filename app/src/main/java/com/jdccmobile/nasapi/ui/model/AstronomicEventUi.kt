@@ -26,6 +26,16 @@ fun List<AstronomicEvent>.toUi(): List<AstronomicEventUi> = map {
     )
 }
 
+fun AstronomicEvent.toUi(): AstronomicEventUi = AstronomicEventUi(
+    id = id,
+    title = title,
+    description = description,
+    date = date,
+    imageUrl = imageUrl,
+    isFavorite = isFavorite,
+    hasImage = hasImage,
+)
+
 fun AstronomicEventUi.toDomain(): AstronomicEvent = AstronomicEvent(
     id = id,
     title = title,
