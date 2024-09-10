@@ -103,6 +103,14 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
+
+    // CameraX
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.camera2)
+    implementation(libs.androidx.lifecycle)
+    implementation(libs.androidx.video)
+    implementation(libs.androidx.extensions)
+    implementation(libs.androidx.view)
 }
 
 ktlint {
