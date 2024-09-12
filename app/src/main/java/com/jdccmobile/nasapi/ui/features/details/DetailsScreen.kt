@@ -1,5 +1,9 @@
 package com.jdccmobile.nasapi.ui.features.details
 
+import android.Manifest
+import androidx.camera.core.CameraSelector
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -15,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,18 +31,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
+import com.jdccmobile.nasapi.ui.components.CameraView
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.DetailsScaffold
 import com.jdccmobile.nasapi.ui.components.IconAndMessageInfo
 import com.jdccmobile.nasapi.ui.components.ImageWithErrorIcon
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
+import com.jdccmobile.nasapi.ui.utils.debugBorder
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import java.time.LocalDate
@@ -75,29 +86,31 @@ private fun DetailsContent(
         onFavoriteFabClicked = onFavoriteFabClicked,
         onTakePhotoFabClicked = onTakePhotoFabClicked,
     ) {
-        if (isDataLoading) {
-            CircularProgressBar()
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy((-48).dp),
-                state = listState,
-            ) {
-                item {
-                    ImageWithErrorIcon(
-                        imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
-                        modifier = Modifier.height(400.dp),
-                    )
-                }
-                item {
-                    astronomicEvent?.let {
-                        EventDescription(
-                            astronomicEvent = it,
-                        )
-                    }
-                }
-            }
-        }
+        CameraView(modifier = Modifier.debugBorder())
+
+//        if (isDataLoading) {
+//            CircularProgressBar()
+//        } else {
+//            LazyColumn(
+//                modifier = Modifier.fillMaxSize(),
+//                verticalArrangement = Arrangement.spacedBy((-48).dp),
+//                state = listState,
+//            ) {
+//                item {
+//                    ImageWithErrorIcon(
+//                        imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
+//                        modifier = Modifier.height(400.dp),
+//                    )
+//                }
+//                item {
+//                    astronomicEvent?.let {
+//                        EventDescription(
+//                            astronomicEvent = it,
+//                        )
+//                    }
+//                }
+//            }
+//        }
     }
 }
 
@@ -157,6 +170,7 @@ fun MyPhotos(modifier: Modifier = Modifier) {
         IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
     }
 }
+
 
 @Preview
 @Composable
