@@ -1,9 +1,5 @@
 package com.jdccmobile.nasapi.ui.features.details
 
-import android.Manifest
-import androidx.camera.core.CameraSelector
-import androidx.camera.view.CameraController
-import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -20,8 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,22 +24,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
-import com.jdccmobile.nasapi.ui.components.CameraView
+import com.jdccmobile.nasapi.ui.components.Camera
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.DetailsScaffold
 import com.jdccmobile.nasapi.ui.components.IconAndMessageInfo
 import com.jdccmobile.nasapi.ui.components.ImageWithErrorIcon
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
-import com.jdccmobile.nasapi.ui.utils.debugBorder
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import java.time.LocalDate
@@ -56,9 +46,12 @@ import java.time.LocalDate
 fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
     val astronomicEvent by viewModel.astronomicEvent.collectAsState()
     val isDataLoading by viewModel.isDataLoading.collectAsState()
+    val showCameraView by viewModel.showCameraView.collectAsState()
+
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
+        showCameraView = showCameraView,
         onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
         onTakePhotoFabClicked = viewModel::onTakePhotoFabClicked,
     )
@@ -69,16 +62,13 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
 private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,
     isDataLoading: Boolean,
+    showCameraView: Boolean,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
-    val favoriteFabIcon = if (astronomicEvent?.isFavorite == true) {
-        Icons.Outlined.Favorite
-    } else {
-        Icons.Outlined.FavoriteBorder
-    }
+    val favoriteFabIcon = getFavoriteFabIcon(astronomicEvent)
 
     DetailsScaffold(
         showFab = showFab,
@@ -86,31 +76,34 @@ private fun DetailsContent(
         onFavoriteFabClicked = onFavoriteFabClicked,
         onTakePhotoFabClicked = onTakePhotoFabClicked,
     ) {
-        CameraView(modifier = Modifier.debugBorder())
-
-//        if (isDataLoading) {
-//            CircularProgressBar()
-//        } else {
-//            LazyColumn(
-//                modifier = Modifier.fillMaxSize(),
-//                verticalArrangement = Arrangement.spacedBy((-48).dp),
-//                state = listState,
-//            ) {
-//                item {
-//                    ImageWithErrorIcon(
-//                        imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
-//                        modifier = Modifier.height(400.dp),
-//                    )
-//                }
-//                item {
-//                    astronomicEvent?.let {
-//                        EventDescription(
-//                            astronomicEvent = it,
-//                        )
-//                    }
-//                }
-//            }
-//        }
+        if (isDataLoading) {
+            CircularProgressBar()
+        } else {
+            if (showCameraView)
+                {
+                    Camera()
+                } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy((-48).dp),
+                    state = listState,
+                ) {
+                    item {
+                        ImageWithErrorIcon(
+                            imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
+                            modifier = Modifier.height(400.dp),
+                        )
+                    }
+                    item {
+                        astronomicEvent?.let {
+                            EventDescription(
+                                astronomicEvent = it,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -171,6 +164,12 @@ fun MyPhotos(modifier: Modifier = Modifier) {
     }
 }
 
+private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
+    if (astronomicEvent?.isFavorite == true) {
+        Icons.Outlined.Favorite
+    } else {
+        Icons.Outlined.FavoriteBorder
+    }
 
 @Preview
 @Composable
@@ -187,6 +186,7 @@ private fun HomeScreenDestinationPreview() {
                 hasImage = false,
             ),
             isDataLoading = false,
+            showCameraView = false,
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
         )

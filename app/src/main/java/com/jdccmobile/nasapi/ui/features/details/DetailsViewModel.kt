@@ -21,15 +21,20 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModel(
-//    private val astronomicEventId: AstronomicEventId,
+//    private val astronomicEventId: AstronomicEventId, // todo
     private val repository: AstronomicEventRepository,
     private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
 ) : ViewModel() {
     private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
 
+    private val _showCameraView: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showCameraView: StateFlow<Boolean> = _showCameraView.asStateFlow()
+
     val astronomicEvent: StateFlow<AstronomicEventUi?> =
-        repository.getAstronomicEventDetails(AstronomicEventId("ae20240902"))
+        repository.getAstronomicEventDetails(
+            AstronomicEventId("ae20240902"),
+        ) // todo astronomicEventId
             .mapLatest {
                 _isDataLoading.value = false
                 it.toUi()
@@ -47,6 +52,6 @@ class DetailsViewModel(
     }
 
     fun onTakePhotoFabClicked() {
-        // TODO open camera
+        _showCameraView.value = true
     }
 }
