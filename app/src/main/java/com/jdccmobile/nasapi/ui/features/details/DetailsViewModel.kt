@@ -3,6 +3,8 @@ package com.jdccmobile.nasapi.ui.features.details
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
+import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
@@ -24,6 +26,7 @@ class DetailsViewModel(
 //    private val astronomicEventId: AstronomicEventId, // todo
     private val repository: AstronomicEventRepository,
     private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
+    private val localDataSource: AstronomicEventLocalDataSource
 ) : ViewModel() {
     private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
@@ -53,5 +56,12 @@ class DetailsViewModel(
 
     fun onTakePhotoFabClicked() {
         _showCameraView.value = true
+    }
+
+    fun onPhotoTaken(photoDb: AstronomicEventPhotoDb) {
+        viewModelScope.launch {
+            localDataSource.insertPhoto(photoDb)
+            _showCameraView.value = false
+        }
     }
 }

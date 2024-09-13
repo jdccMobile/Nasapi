@@ -31,11 +31,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
+import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.theme.Dimens
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 @Composable
 fun Camera(
+    eventId: AstronomicEventId,
+    onPhotoTaken: (AstronomicEventPhotoDb) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -48,7 +55,7 @@ fun Camera(
     }
     Box(modifier = modifier.fillMaxSize()) {
         CameraView(controller = controller)
-        CameraButtons(controller = controller, context = context)
+        CameraButtons( controller = controller,  context = context, onPhotoTakenToDb = onPhotoTaken, eventId = eventId.value)
     }
 }
 
@@ -73,7 +80,9 @@ private fun CameraView(
 private fun BoxScope.CameraButtons(
     controller: LifecycleCameraController,
     context: Context,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
     modifier: Modifier = Modifier,
+    eventId: String,
 ) {
     Row(
         modifier = modifier
@@ -102,8 +111,10 @@ private fun BoxScope.CameraButtons(
             onClick = {
                 takePhoto(
                     controller = controller,
-                    onPhotoTaken = {},
+                    onPhotoTaken = { },
+                    onPhotoTakenToDb = onPhotoTakenToDb,
                     context = context,
+                    eventId
                 )
             },
         ) {
@@ -136,7 +147,9 @@ private fun BoxScope.CameraButtons(
 private fun takePhoto(
     controller: LifecycleCameraController,
     onPhotoTaken: (Bitmap) -> Unit,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
     context: Context,
+    eventId: String, // Agrega el ID del evento astronómico
 ) {
     controller.takePicture(
         ContextCompat.getMainExecutor(context),
@@ -155,7 +168,18 @@ private fun takePhoto(
                     matrix,
                     true,
                 )
+                val filePath = savePhotoLocally(context, rotatedBitmap)
                 onPhotoTaken(rotatedBitmap)
+
+                // Guarda la foto en la base de datos
+                onPhotoTakenToDb(
+                    AstronomicEventPhotoDb(
+                        photoId = UUID.randomUUID().toString(), // Genera un ID único
+                        eventId = eventId,
+                        filePath = filePath,
+                    ),
+                )
+//                savePhotoToDatabase(context, eventId, filePath)
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -165,3 +189,26 @@ private fun takePhoto(
         },
     )
 }
+
+
+private fun savePhotoLocally(context: Context, bitmap: Bitmap): String {
+    val fileName = "photo_${System.currentTimeMillis()}.jpg"
+    val file = File(context.filesDir, fileName)
+    FileOutputStream(file).use { out ->
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+    }
+    return file.absolutePath // Retorna la ruta del archivo guardado
+}
+
+private fun savePhotoToDatabase(context: Context, eventId: String, filePath: String) {
+    val photo = AstronomicEventPhotoDb(
+        photoId = UUID.randomUUID().toString(), // Genera un ID único
+        eventId = eventId,
+        filePath = filePath,
+    )
+
+    // Inserta el objeto en la base de datos
+//    val db = AppDatabase.getInstance(context) // Supone que tienes una instancia de Room
+//    db.astronomicEventPhotoDao().insert(photo)
+}
+

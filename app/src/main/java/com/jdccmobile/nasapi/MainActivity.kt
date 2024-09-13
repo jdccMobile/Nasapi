@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.jdccmobile.nasapi.ui.features.details.DetailsScreen
+import com.jdccmobile.nasapi.ui.features.home.HomeScreen
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 
 class MainActivity : ComponentActivity() {

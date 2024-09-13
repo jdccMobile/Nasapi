@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.Camera
@@ -54,6 +55,7 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         showCameraView = showCameraView,
         onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
         onTakePhotoFabClicked = viewModel::onTakePhotoFabClicked,
+        onPhotoTaken = viewModel::onPhotoTaken,
     )
 }
 
@@ -65,6 +67,7 @@ private fun DetailsContent(
     showCameraView: Boolean,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
+    onPhotoTaken: (AstronomicEventPhotoDb) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
@@ -81,7 +84,7 @@ private fun DetailsContent(
         } else {
             if (showCameraView)
                 {
-                    Camera()
+                    Camera(astronomicEvent?.id ?: AstronomicEventId(""), onPhotoTaken, )
                 } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -189,6 +192,7 @@ private fun HomeScreenDestinationPreview() {
             showCameraView = false,
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
+            onPhotoTaken = {}
         )
     }
 }

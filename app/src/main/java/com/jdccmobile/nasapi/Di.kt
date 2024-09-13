@@ -65,6 +65,7 @@ private val dataModule = module {
         ).build()
     }
     single { get<AstronomicEventDatabase>().getAstronomicEventDao() }
+    single { get<AstronomicEventDatabase>().getAstronomicEventPhotoDao() }
 }
 
 private val domainModule = module {
