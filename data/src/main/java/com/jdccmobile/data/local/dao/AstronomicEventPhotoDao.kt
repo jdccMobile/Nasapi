@@ -14,6 +14,6 @@ interface AstronomicEventPhotoDao {
     suspend fun insertPhoto(photo: AstronomicEventPhotoDb)
 
     @Query("SELECT * FROM astronomic_events_photos_table WHERE event_id = :eventId")
-    suspend fun getPhotosByEvent(eventId: String): List<AstronomicEventPhotoDb>
+    fun getPhotosByEvent(eventId: String): Flow<List<AstronomicEventPhotoDb>>
 }
 

@@ -45,6 +45,11 @@ class DetailsViewModel(
             .onStart { _isDataLoading.value = true }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    val photos: StateFlow<List<AstronomicEventPhotoDb>> =
+        localDataSource.getPhotosByEvent(
+            AstronomicEventId("ae20240902").value,
+        ).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
     fun onFavoriteFabClicked() {
         viewModelScope.launch {
             Log.i("asd", astronomicEvent.toString())
@@ -64,4 +69,6 @@ class DetailsViewModel(
             _showCameraView.value = false
         }
     }
+
 }
+

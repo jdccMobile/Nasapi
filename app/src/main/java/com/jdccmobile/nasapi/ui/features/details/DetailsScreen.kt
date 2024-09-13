@@ -1,14 +1,18 @@
 package com.jdccmobile.nasapi.ui.features.details
 
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,11 +53,13 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
     val astronomicEvent by viewModel.astronomicEvent.collectAsState()
     val isDataLoading by viewModel.isDataLoading.collectAsState()
     val showCameraView by viewModel.showCameraView.collectAsState()
+    val photos by viewModel.photos.collectAsState()
 
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
         showCameraView = showCameraView,
+        photos = photos,
         onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
         onTakePhotoFabClicked = viewModel::onTakePhotoFabClicked,
         onPhotoTaken = viewModel::onPhotoTaken,
@@ -65,6 +72,7 @@ private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,
     isDataLoading: Boolean,
     showCameraView: Boolean,
+    photos: List<AstronomicEventPhotoDb>,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
     onPhotoTaken: (AstronomicEventPhotoDb) -> Unit,
@@ -82,10 +90,9 @@ private fun DetailsContent(
         if (isDataLoading) {
             CircularProgressBar()
         } else {
-            if (showCameraView)
-                {
-                    Camera(astronomicEvent?.id ?: AstronomicEventId(""), onPhotoTaken, )
-                } else {
+            if (showCameraView) {
+                Camera(astronomicEvent?.id ?: AstronomicEventId(""), onPhotoTaken)
+            } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy((-48).dp),
@@ -101,6 +108,7 @@ private fun DetailsContent(
                         astronomicEvent?.let {
                             EventDescription(
                                 astronomicEvent = it,
+                                photos = photos,
                             )
                         }
                     }
@@ -113,6 +121,7 @@ private fun DetailsContent(
 @Composable
 private fun EventDescription(
     astronomicEvent: AstronomicEventUi,
+    photos: List<AstronomicEventPhotoDb>,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -147,24 +156,35 @@ private fun EventDescription(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp))
 
-            MyPhotos()
+            MyPhotos(photos = photos)
         }
     }
 }
 
 @Composable
-fun MyPhotos(modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.my_photos),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-        // TODO hacer comprobacion de si hay fotos
-        IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
+fun MyPhotos(modifier: Modifier = Modifier, photos: List<AstronomicEventPhotoDb>) {
+    val photoList = photos.map { photo ->
+        BitmapFactory.decodeFile(photo.filePath) // Carga el bitmap desde la ruta de cada foto
     }
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier.height(400.dp),
+    ) {
+        items(photoList) {
+            Image(bitmap = it.asImageBitmap(), contentDescription = null)
+        }
+    }
+//    Column(modifier = modifier) {
+//        Text(
+//            text = stringResource(R.string.my_photos),
+//            style = MaterialTheme.typography.bodyMedium,
+//            fontWeight = FontWeight.Bold,
+//            color = MaterialTheme.colorScheme.primary,
+//            modifier = Modifier.padding(bottom = 16.dp),
+//        )
+//         TODO hacer comprobacion de si hay fotos
+//        IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
+//    }
 }
 
 private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
@@ -192,7 +212,9 @@ private fun HomeScreenDestinationPreview() {
             showCameraView = false,
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
-            onPhotoTaken = {}
-        )
+            photos = emptyList(),
+            onPhotoTaken = {},
+
+            )
     }
 }
