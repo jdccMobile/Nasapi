@@ -36,7 +36,7 @@ class DetailsViewModel(
 
     val astronomicEvent: StateFlow<AstronomicEventUi?> =
         repository.getAstronomicEventDetails(
-            AstronomicEventId("ae20240902"),
+            AstronomicEventId("ae20240902"), // todo
         ) // todo astronomicEventId
             .mapLatest {
                 _isDataLoading.value = false
@@ -45,9 +45,9 @@ class DetailsViewModel(
             .onStart { _isDataLoading.value = true }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val photos: StateFlow<List<AstronomicEventPhotoDb>> =
+    val userPhotos: StateFlow<List<AstronomicEventPhotoDb>> =
         localDataSource.getPhotosByEvent(
-            AstronomicEventId("ae20240902").value,
+            AstronomicEventId("ae20240902").value, // todo
         ).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun onFavoriteFabClicked() {
