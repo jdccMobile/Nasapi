@@ -17,26 +17,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
-        if (!hasRequiredPermissions()) {
-            ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
-        }
+
         super.onCreate(savedInstanceState)
         setContent {
             NasapiTheme {
                 DetailsScreen()
             }
         }
-    }
-
-    private fun hasRequiredPermissions(): Boolean =
-        CAMERAX_PERMISSIONS.all { permission ->
-            ContextCompat.checkSelfPermission(
-                applicationContext,
-                permission,
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-
-    companion object {
-        private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 }

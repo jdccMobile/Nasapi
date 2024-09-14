@@ -1,6 +1,12 @@
 package com.jdccmobile.nasapi.ui.features.details
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,10 +35,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
@@ -55,13 +63,29 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
     val showCameraView by viewModel.showCameraView.collectAsState()
     val userPhotos by viewModel.userPhotos.collectAsState()
 
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                viewModel.onTakePhotoFabClicked()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.camera_permission_denied),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        },
+    )
+
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
         showCameraView = showCameraView,
         userPhotos = userPhotos,
         onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
-        onTakePhotoFabClicked = viewModel::onTakePhotoFabClicked,
+        onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onPhotoTaken = viewModel::onPhotoTaken,
     )
 }
@@ -104,14 +128,7 @@ private fun DetailsContent(
                             modifier = Modifier.height(400.dp),
                         )
                     }
-                    item {
-                        astronomicEvent?.let {
-                            EventDescription(
-                                astronomicEvent = it,
-                                photos = userPhotos,
-                            )
-                        }
-                    }
+                    item { astronomicEvent?.let { EventDescription(astronomicEvent = it) } }
                     item { MyPhotos(userPhotos = userPhotos) }
                 }
             }
@@ -122,7 +139,6 @@ private fun DetailsContent(
 @Composable
 private fun EventDescription(
     astronomicEvent: AstronomicEventUi,
-    photos: List<AstronomicEventPhotoDb>,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -155,7 +171,7 @@ private fun EventDescription(
                 style = MaterialTheme.typography.bodySmall,
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp))
+            HorizontalDivider(modifier = Modifier.padding(top = 24.dp))
         }
     }
 }
@@ -165,7 +181,7 @@ fun MyPhotos(modifier: Modifier = Modifier, userPhotos: List<AstronomicEventPhot
     val photoList = userPhotos.map { photo ->
         BitmapFactory.decodeFile(photo.filePath)
     }
-    Column(modifier = modifier.padding(24.dp)) {
+    Column(modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp)) {
         MyPhotosTitle()
         if (photoList.isEmpty()) {
             IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
@@ -195,12 +211,30 @@ private fun MyPhotosTitle(modifier: Modifier = Modifier) {
     )
 }
 
+fun requestCameraPermission(
+    context: Context,
+    permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
+    viewModel: DetailsViewModel,
+) {
+    val permission = android.Manifest.permission.CAMERA
+    if (ContextCompat.checkSelfPermission(
+            context,
+            permission,
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        permissionLauncher.launch(permission)
+    } else {
+        viewModel.onTakePhotoFabClicked()
+    }
+}
+
 private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
     if (astronomicEvent?.isFavorite == true) {
         Icons.Outlined.Favorite
     } else {
         Icons.Outlined.FavoriteBorder
     }
+
 
 @Preview
 @Composable

@@ -1,6 +1,10 @@
 package com.jdccmobile.nasapi.ui.features.details
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
@@ -36,7 +40,7 @@ class DetailsViewModel(
 
     val astronomicEvent: StateFlow<AstronomicEventUi?> =
         repository.getAstronomicEventDetails(
-            AstronomicEventId("ae20240902"), // todo
+            AstronomicEventId("ae20240914"), // todo
         ) // todo astronomicEventId
             .mapLatest {
                 _isDataLoading.value = false
@@ -47,7 +51,7 @@ class DetailsViewModel(
 
     val userPhotos: StateFlow<List<AstronomicEventPhotoDb>> =
         localDataSource.getPhotosByEvent(
-            AstronomicEventId("ae20240902").value, // todo
+            AstronomicEventId("ae20240914").value, // todo
         ).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun onFavoriteFabClicked() {
@@ -55,7 +59,6 @@ class DetailsViewModel(
             Log.i("asd", astronomicEvent.toString())
             astronomicEvent.value?.let { switchEventFavoriteStatusUseCase(it.toDomain()) }
         }
-
         // TODO add toast
     }
 
@@ -69,6 +72,7 @@ class DetailsViewModel(
             _showCameraView.value = false
         }
     }
-
 }
+
+
 
