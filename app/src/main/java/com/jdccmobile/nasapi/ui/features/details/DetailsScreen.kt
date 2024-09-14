@@ -115,7 +115,13 @@ private fun DetailsContent(
             CircularProgressBar()
         } else {
             if (showCameraView) {
-                Camera(astronomicEvent?.id ?: AstronomicEventId(""), onPhotoTaken)
+                Camera(
+                    eventId = astronomicEvent?.id ?: AstronomicEventId(""),
+                    onPhotoTaken = onPhotoTaken,
+                    onCloseCamera = {
+                        // Todo add navigation
+                    },
+                )
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),

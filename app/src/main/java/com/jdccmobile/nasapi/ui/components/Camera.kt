@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -43,6 +46,7 @@ import java.util.UUID
 fun Camera(
     eventId: AstronomicEventId,
     onPhotoTaken: (AstronomicEventPhotoDb) -> Unit,
+    onCloseCamera: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -55,7 +59,13 @@ fun Camera(
     }
     Box(modifier = modifier.fillMaxSize()) {
         CameraView(controller = controller)
-        CameraButtons( controller = controller,  context = context, onPhotoTakenToDb = onPhotoTaken, eventId = eventId.value)
+        CameraButtons(
+            controller = controller,
+            context = context,
+            onPhotoTakenToDb = onPhotoTaken,
+            onCloseCamera = onCloseCamera,
+            eventId = eventId.value,
+        )
     }
 }
 
@@ -81,6 +91,7 @@ private fun BoxScope.CameraButtons(
     controller: LifecycleCameraController,
     context: Context,
     onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onCloseCamera: () -> Unit,
     modifier: Modifier = Modifier,
     eventId: String,
 ) {
@@ -91,6 +102,32 @@ private fun BoxScope.CameraButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
+        IconButton(
+            onClick = { onCloseCamera() },
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.minTouchSize),
+            )
+        }
+        IconButton(
+            onClick = {
+                takePhoto(
+                    controller = controller,
+                    onPhotoTaken = { },
+                    onPhotoTakenToDb = onPhotoTakenToDb,
+                    context = context,
+                    eventId,
+                )
+            },
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_photo_camera),
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.minTouchSize),
+            )
+        }
         IconButton(
             onClick = {
                 controller.cameraSelector =
@@ -107,49 +144,15 @@ private fun BoxScope.CameraButtons(
                 modifier = Modifier.size(Dimens.minTouchSize),
             )
         }
-        IconButton(
-            onClick = {
-                takePhoto(
-                    controller = controller,
-                    onPhotoTaken = { },
-                    onPhotoTakenToDb = onPhotoTakenToDb,
-                    context = context,
-                    eventId
-                )
-            },
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_photo_camera),
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.minTouchSize),
-            )
-        }
     }
 }
-
-// @Composable
-// fun PhotoBottomSheetContent(
-//    bitmaps: List<Bitmap>,
-//    modifier: Modifier = Modifier,
-// ) {
-//    Box(modifier = Modifier.fillMaxSize()) {
-//        LazyColumn(
-//            contentPadding = PaddingValues(16.dp),
-//            modifier = modifier,
-//        ) {
-//            items(bitmaps) {
-//                Image(bitmap = it.asImageBitmap(), contentDescription = null)
-//            }
-//        }
-//    }
-// }
 
 private fun takePhoto(
     controller: LifecycleCameraController,
     onPhotoTaken: (Bitmap) -> Unit,
     onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
     context: Context,
-    eventId: String, // Agrega el ID del evento astronómico
+    eventId: String,
 ) {
     controller.takePicture(
         ContextCompat.getMainExecutor(context),
@@ -171,7 +174,6 @@ private fun takePhoto(
                 val filePath = savePhotoLocally(context, rotatedBitmap)
                 onPhotoTaken(rotatedBitmap)
 
-                // Guarda la foto en la base de datos
                 onPhotoTakenToDb(
                     AstronomicEventPhotoDb(
                         photoId = UUID.randomUUID().toString(), // Genera un ID único
@@ -179,7 +181,6 @@ private fun takePhoto(
                         filePath = filePath,
                     ),
                 )
-//                savePhotoToDatabase(context, eventId, filePath)
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -197,18 +198,5 @@ private fun savePhotoLocally(context: Context, bitmap: Bitmap): String {
     FileOutputStream(file).use { out ->
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
     }
-    return file.absolutePath // Retorna la ruta del archivo guardado
+    return file.absolutePath
 }
-
-private fun savePhotoToDatabase(context: Context, eventId: String, filePath: String) {
-    val photo = AstronomicEventPhotoDb(
-        photoId = UUID.randomUUID().toString(), // Genera un ID único
-        eventId = eventId,
-        filePath = filePath,
-    )
-
-    // Inserta el objeto en la base de datos
-//    val db = AppDatabase.getInstance(context) // Supone que tienes una instancia de Room
-//    db.astronomicEventPhotoDao().insert(photo)
-}
-
