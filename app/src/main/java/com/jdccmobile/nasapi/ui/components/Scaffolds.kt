@@ -131,7 +131,8 @@ fun TopBarWithNavigationScaffold(
 
 @Composable
 fun DetailsScaffold(
-    showFab: Boolean,
+    showBackFab: Boolean,
+    showAllFabs: Boolean,
     favoriteFabIcon: ImageVector,
     modifier: Modifier = Modifier,
     onFavoriteFabClicked: () -> Unit,
@@ -142,24 +143,26 @@ fun DetailsScaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
-            Column {
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White,
-                    onClick = { onTakePhotoFabClicked() },
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add_a_photo),
-                        contentDescription = null,
-                    )
-                }
-                Spacer(modifier = Modifier.padding(8.dp))
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White,
-                    onClick = { onFavoriteFabClicked() },
-                ) {
-                    Icon(imageVector = favoriteFabIcon, contentDescription = null)
+            if (showAllFabs) {
+                Column {
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White,
+                        onClick = { onTakePhotoFabClicked() },
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_add_a_photo),
+                            contentDescription = null,
+                        )
+                    }
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White,
+                        onClick = { onFavoriteFabClicked() },
+                    ) {
+                        Icon(imageVector = favoriteFabIcon, contentDescription = null)
+                    }
                 }
             }
         },
@@ -170,19 +173,23 @@ fun DetailsScaffold(
                 .fillMaxSize(),
         ) {
             content()
-            AnimatedVisibility(visible = showFab, enter = fadeIn(), exit = fadeOut()) {
-                FloatingActionButton(
-                    onClick = {},
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(Dimens.appPadding),
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                    )
+            if(showAllFabs) {
+                AnimatedVisibility(visible = showBackFab, enter = fadeIn(), exit = fadeOut()) {
+                    FloatingActionButton(
+                        onClick = {
+                            // TODO add navigation
+                        },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(Dimens.appPadding),
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         }

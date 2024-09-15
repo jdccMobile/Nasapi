@@ -102,11 +102,12 @@ private fun DetailsContent(
     onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
+    val showBackFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
     val favoriteFabIcon = getFavoriteFabIcon(astronomicEvent)
 
     DetailsScaffold(
-        showFab = showFab,
+        showBackFab = showBackFab,
+        showAllFabs = !showCameraView,
         favoriteFabIcon = favoriteFabIcon,
         onFavoriteFabClicked = onFavoriteFabClicked,
         onTakePhotoFabClicked = onTakePhotoFabClicked,
