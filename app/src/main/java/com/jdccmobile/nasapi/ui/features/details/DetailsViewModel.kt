@@ -64,8 +64,14 @@ class DetailsViewModel(
 
     fun onPhotoTakenToDb(photoDb: AstronomicEventPhotoDb) {
         viewModelScope.launch {
-            localDataSource.insertPhoto(photoDb)
+            localDataSource.insertPhoto(photoDb) // TODO crear usecase
             _showCameraView.value = false
+        }
+    }
+
+    fun onDeletePhoto(photoDb: AstronomicEventPhotoDb) {
+        viewModelScope.launch {
+            localDataSource.deletePhoto(photoDb) // TODO crear usecase actualizar tambien el has foto
         }
     }
 }

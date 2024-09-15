@@ -31,7 +31,6 @@ class AstronomicEventLocalDataSource(
             }
         }
 
-
     fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
         astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
 
@@ -70,5 +69,10 @@ class AstronomicEventLocalDataSource(
     suspend fun insertPhoto(photo: AstronomicEventPhotoDb) {
         astronomicEventPhotoDao.insertPhoto(photo)
     }
+
+    suspend fun deletePhoto(photo: AstronomicEventPhotoDb): Either<MyError, Unit> =
+        catch {
+            astronomicEventPhotoDao.deletePhoto(photo)
+        }.mapLeft { it.toMyError() }
 
 }

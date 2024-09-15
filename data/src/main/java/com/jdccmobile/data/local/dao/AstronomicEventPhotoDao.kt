@@ -1,10 +1,10 @@
 package com.jdccmobile.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.jdccmobile.data.local.model.AstronomicEventDb
 import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import kotlinx.coroutines.flow.Flow
 
@@ -15,5 +15,8 @@ interface AstronomicEventPhotoDao {
 
     @Query("SELECT * FROM astronomic_events_photos_table WHERE event_id = :eventId")
     fun getPhotosByEvent(eventId: String): Flow<List<AstronomicEventPhotoDb>>
+
+    @Delete
+    suspend fun deletePhoto(photo: AstronomicEventPhotoDb)
 }
 

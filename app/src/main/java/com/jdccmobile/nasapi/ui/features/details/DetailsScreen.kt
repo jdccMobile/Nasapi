@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,15 +17,21 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
@@ -50,6 +58,7 @@ import com.jdccmobile.nasapi.ui.components.DetailsScaffold
 import com.jdccmobile.nasapi.ui.components.IconAndMessageInfo
 import com.jdccmobile.nasapi.ui.components.ImageWithErrorIcon
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -87,6 +96,7 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onPhotoTakenToDb = viewModel::onPhotoTakenToDb,
+        onDeleteUserPhoto = viewModel::onDeletePhoto,
     )
 }
 
@@ -100,6 +110,7 @@ private fun DetailsContent(
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
     onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onDeleteUserPhoto: (AstronomicEventPhotoDb) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showBackFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
@@ -136,7 +147,12 @@ private fun DetailsContent(
                         )
                     }
                     item { astronomicEvent?.let { EventDescription(astronomicEvent = it) } }
-                    item { MyPhotos(userPhotos = userPhotos) }
+                    item {
+                        MyPhotos(
+                            userPhotos = userPhotos,
+                            onDeleteUserPhoto = onDeleteUserPhoto,
+                        )
+                    }
                 }
             }
         }
@@ -183,26 +199,72 @@ private fun EventDescription(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MyPhotos(modifier: Modifier = Modifier, userPhotos: List<AstronomicEventPhotoDb>) {
-    val photoList = userPhotos.map { photo ->
-        BitmapFactory.decodeFile(photo.filePath)
-    }
+fun MyPhotos(
+    userPhotos: List<AstronomicEventPhotoDb>,
+    onDeleteUserPhoto: (AstronomicEventPhotoDb) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp)) {
         MyPhotosTitle()
-        if (photoList.isEmpty()) {
+        if (userPhotos.isEmpty()) {
             IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
         } else {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(photoList) {
-                    Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.padding(vertical = 16.dp),
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(vertical = 16.dp),
+            ) {
+                items(userPhotos, key = { it.photoId }) { photo ->
+                    MyPhotoCard(
+                        photo = photo,
+                        onDeleteUserPhoto = onDeleteUserPhoto,
+                        modifier = Modifier.animateItemPlacement(),
                     )
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+private fun MyPhotoCard(
+    photo: AstronomicEventPhotoDb,
+    onDeleteUserPhoto: (AstronomicEventPhotoDb) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val photoPath = BitmapFactory.decodeFile(photo.filePath)
+
+    Card(
+        onClick = {
+            // TODO open full image
+        },
+        modifier = modifier.height(200.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            Image(
+                bitmap = photoPath.asImageBitmap(),
+                contentDescription = null,
+            )
+            IconButton(
+                onClick = { onDeleteUserPhoto(photo) },
+                modifier = Modifier
+                    .size(Dimens.minTouchSize)
+                    .align(Alignment.TopEnd),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }
@@ -263,7 +325,7 @@ private fun HomeScreenDestinationPreview() {
             onTakePhotoFabClicked = {},
             userPhotos = emptyList(),
             onPhotoTakenToDb = {},
-
-            )
+            onDeleteUserPhoto = {},
+        )
     }
 }
