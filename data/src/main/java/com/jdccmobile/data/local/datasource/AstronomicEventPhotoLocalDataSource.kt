@@ -15,6 +15,7 @@ import com.jdccmobile.domain.model.MyError
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AstronomicEventPhotoLocalDataSource(
@@ -32,6 +33,8 @@ class AstronomicEventPhotoLocalDataSource(
 
     suspend fun deletePhoto(photo: AstronomicEventPhoto): Either<MyError, Unit> =
         catch {
+            val fileToDelete = File(photo.filePath)
+            if(fileToDelete.exists()) fileToDelete.delete()
             astronomicEventPhotoDao.deletePhoto(photo.toDb())
         }.mapLeft { it.toMyError() }
 
