@@ -173,7 +173,7 @@ fun DetailsScaffold(
                 .fillMaxSize(),
         ) {
             content()
-            if(showAllFabs) {
+            if (showAllFabs) {
                 AnimatedVisibility(visible = showBackFab, enter = fadeIn(), exit = fadeOut()) {
                     FloatingActionButton(
                         onClick = {

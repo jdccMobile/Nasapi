@@ -1,10 +1,8 @@
 package com.jdccmobile.nasapi.ui.model
 
-import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.AstronomicEventPhoto
 import com.jdccmobile.domain.model.AstronomicEventPhotoId
-import java.time.LocalDate
 
 data class AstronomicEventPhotoUi(
     val photoId: AstronomicEventPhotoId,

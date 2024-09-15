@@ -142,7 +142,7 @@ private fun DetailsContent(
                 ) {
                     item {
                         ImageWithErrorIcon(
-                            imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
+                            imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg", // todo
                             modifier = Modifier.height(400.dp),
                         )
                     }
@@ -223,7 +223,6 @@ fun MyPhotos(
                     )
                 }
             }
-
         }
     }
 }
@@ -248,7 +247,6 @@ private fun MyPhotoCard(
         ),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-
             Image(
                 bitmap = photoPath.asImageBitmap(),
                 contentDescription = null,
@@ -303,7 +301,6 @@ private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
     } else {
         Icons.Outlined.FavoriteBorder
     }
-
 
 @Preview
 @Composable

@@ -41,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.AstronomicEventPhotoId
 import com.jdccmobile.nasapi.R
@@ -130,7 +129,7 @@ private fun PhotoPreview(
             bitmap = previewPhoto.asImageBitmap(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
         PreviewButtons(
             eventId = eventId.value,
@@ -277,7 +276,7 @@ private fun takePhoto(
     )
 }
 
-
+@Suppress("MagicNumber")
 private fun savePhotoLocally(
     eventId: String,
     previewImage: Bitmap,
@@ -291,7 +290,7 @@ private fun savePhotoLocally(
     }
     onSavePhotoTaken(
         AstronomicEventPhotoUi(
-            photoId = AstronomicEventPhotoId( UUID.randomUUID().toString()),
+            photoId = AstronomicEventPhotoId(UUID.randomUUID().toString()),
             eventId = AstronomicEventId(eventId),
             filePath = file.absolutePath,
         ),
