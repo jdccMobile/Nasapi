@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
+import com.jdccmobile.domain.model.AstronomicEventPhoto
+import com.jdccmobile.domain.model.AstronomicEventPhotoId
 import java.time.LocalDate
 
 
@@ -19,3 +21,17 @@ data class AstronomicEventPhotoDb(
 )
 
 const val ASTRONOMIC_EVENT_PHOTOS_TABLE = "astronomic_events_photos_table"
+
+fun AstronomicEventPhoto.toDb(): AstronomicEventPhotoDb =
+    AstronomicEventPhotoDb(
+        photoId = photoId.value,
+        eventId = eventId.value,
+        filePath = filePath
+    )
+
+fun AstronomicEventPhotoDb.toDomain(): AstronomicEventPhoto =
+    AstronomicEventPhoto(
+        photoId = AstronomicEventPhotoId(photoId),
+        eventId = AstronomicEventId(eventId),
+        filePath = filePath
+    )

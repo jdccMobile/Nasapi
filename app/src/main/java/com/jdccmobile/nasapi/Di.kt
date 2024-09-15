@@ -4,14 +4,20 @@ import android.app.Application
 import androidx.room.Room
 import com.jdccmobile.data.local.AstronomicEventDatabase
 import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
+import com.jdccmobile.data.local.datasource.AstronomicEventPhotoLocalDataSource
 import com.jdccmobile.data.remote.RetrofitService
 import com.jdccmobile.data.remote.RetrofitServiceFactory
 import com.jdccmobile.data.remote.datasource.AstronomicEventRemoteDataSource
+import com.jdccmobile.data.repository.AstronomicEventPhotoRepositoryImpl
 import com.jdccmobile.data.repository.AstronomicEventRepositoryImpl
 import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
+import com.jdccmobile.domain.repository.AstronomicEventPhotoRepository
 import com.jdccmobile.domain.repository.AstronomicEventRepository
+import com.jdccmobile.domain.usecase.DeletePhotoUseCase
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
+import com.jdccmobile.domain.usecase.InsertPhotoUseCase
 import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
@@ -46,7 +52,9 @@ private val appModule = module {
 
 private val dataModule = module {
     factoryOf(::AstronomicEventRepositoryImpl) bind AstronomicEventRepository::class
+    factoryOf(::AstronomicEventPhotoRepositoryImpl) bind AstronomicEventPhotoRepository::class
     factoryOf(::AstronomicEventLocalDataSource)
+    factoryOf(::AstronomicEventPhotoLocalDataSource)
     factoryOf(::RequestAndInsertEventsPerWeek)
 
     single<RetrofitService> { RetrofitServiceFactory.makeRetrofitService() }
@@ -73,6 +81,9 @@ private val domainModule = module {
     factoryOf(::GetAstronomicEventsUseCase)
     factoryOf(::GetFavoriteAstronomicEventsUseCase)
     factoryOf(::SwitchEventFavoriteStatusUseCase)
+    factoryOf(::GetPhotosByEventUseCase)
+    factoryOf(::InsertPhotoUseCase)
+    factoryOf(::DeletePhotoUseCase)
 }
 
 private const val API_KEY_NAMED = "apiKey"

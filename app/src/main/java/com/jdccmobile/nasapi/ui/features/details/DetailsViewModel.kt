@@ -1,13 +1,14 @@
 package com.jdccmobile.nasapi.ui.features.details
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
-import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.repository.AstronomicEventRepository
+import com.jdccmobile.domain.usecase.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
+import com.jdccmobile.domain.usecase.InsertPhotoUseCase
 import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
+import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toDomain
 import com.jdccmobile.nasapi.ui.model.toUi
@@ -26,7 +27,9 @@ class DetailsViewModel(
 //    private val astronomicEventId: AstronomicEventId, // todo
     private val repository: AstronomicEventRepository,
     private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
-    private val localDataSource: AstronomicEventLocalDataSource
+    getPhotosByEventUseCase: GetPhotosByEventUseCase,
+    private val insertPhotoUseCase: InsertPhotoUseCase,
+    private val deletePhotoUseCase: DeletePhotoUseCase,
 ) : ViewModel() {
     private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
@@ -45,36 +48,31 @@ class DetailsViewModel(
             .onStart { _isDataLoading.value = true }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val userPhotos: StateFlow<List<AstronomicEventPhotoDb>> =
-        localDataSource.getPhotosByEvent(
-            AstronomicEventId("ae20240914").value, // todo
-        ).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val userPhotos: StateFlow<List<AstronomicEventPhotoUi>> =
+        getPhotosByEventUseCase(AstronomicEventId("ae20240914")) // todo
+            .mapLatest { it.toUi() }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun onFavoriteFabClicked() {
+    fun onSwitchFavStatusClicked() {
         viewModelScope.launch {
-            Log.i("asd", astronomicEvent.toString())
             astronomicEvent.value?.let { switchEventFavoriteStatusUseCase(it.toDomain()) }
         }
-        // TODO add toast
     }
 
-    fun onTakePhotoFabClicked() {
+    fun onOpenCameraClicked() {
         _showCameraView.value = true
     }
 
-    fun onPhotoTakenToDb(photoDb: AstronomicEventPhotoDb) {
+    fun onSavePhotoTaken(photo: AstronomicEventPhotoUi) {
         viewModelScope.launch {
-            localDataSource.insertPhoto(photoDb) // TODO crear usecase
+            insertPhotoUseCase(photo.toDomain())
             _showCameraView.value = false
         }
     }
 
-    fun onDeletePhoto(photoDb: AstronomicEventPhotoDb) {
+    fun onDeletePhoto(photo: AstronomicEventPhotoUi) {
         viewModelScope.launch {
-            localDataSource.deletePhoto(photoDb) // TODO crear usecase actualizar tambien el has foto
+            deletePhotoUseCase(photo.toDomain())
         }
     }
 }
-
-
-

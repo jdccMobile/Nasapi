@@ -49,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.Camera
@@ -57,6 +56,7 @@ import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.DetailsScaffold
 import com.jdccmobile.nasapi.ui.components.IconAndMessageInfo
 import com.jdccmobile.nasapi.ui.components.ImageWithErrorIcon
+import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
@@ -77,7 +77,7 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                viewModel.onTakePhotoFabClicked()
+                viewModel.onOpenCameraClicked()
             } else {
                 Toast.makeText(
                     context,
@@ -93,9 +93,9 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         isDataLoading = isDataLoading,
         showCameraView = showCameraView,
         userPhotos = userPhotos,
-        onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
+        onFavoriteFabClicked = viewModel::onSwitchFavStatusClicked,
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
-        onPhotoTakenToDb = viewModel::onPhotoTakenToDb,
+        onSavePhotoTaken = viewModel::onSavePhotoTaken,
         onDeleteUserPhoto = viewModel::onDeletePhoto,
     )
 }
@@ -106,11 +106,11 @@ private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,
     isDataLoading: Boolean,
     showCameraView: Boolean,
-    userPhotos: List<AstronomicEventPhotoDb>,
+    userPhotos: List<AstronomicEventPhotoUi>,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
-    onDeleteUserPhoto: (AstronomicEventPhotoDb) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showBackFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
@@ -129,7 +129,7 @@ private fun DetailsContent(
             if (showCameraView) {
                 Camera(
                     eventId = astronomicEvent?.id ?: AstronomicEventId(""),
-                    onPhotoTakenToDb = onPhotoTakenToDb,
+                    onSavePhotoTaken = onSavePhotoTaken,
                     onCloseCamera = {
                         // Todo add navigation
                     },
@@ -202,8 +202,8 @@ private fun EventDescription(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyPhotos(
-    userPhotos: List<AstronomicEventPhotoDb>,
-    onDeleteUserPhoto: (AstronomicEventPhotoDb) -> Unit,
+    userPhotos: List<AstronomicEventPhotoUi>,
+    onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp)) {
@@ -215,7 +215,7 @@ fun MyPhotos(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(vertical = 16.dp),
             ) {
-                items(userPhotos, key = { it.photoId }) { photo ->
+                items(userPhotos, key = { it.photoId.value }) { photo ->
                     MyPhotoCard(
                         photo = photo,
                         onDeleteUserPhoto = onDeleteUserPhoto,
@@ -230,8 +230,8 @@ fun MyPhotos(
 
 @Composable
 private fun MyPhotoCard(
-    photo: AstronomicEventPhotoDb,
-    onDeleteUserPhoto: (AstronomicEventPhotoDb) -> Unit,
+    photo: AstronomicEventPhotoUi,
+    onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val photoPath = BitmapFactory.decodeFile(photo.filePath)
@@ -293,7 +293,7 @@ fun requestCameraPermission(
     ) {
         permissionLauncher.launch(permission)
     } else {
-        viewModel.onTakePhotoFabClicked()
+        viewModel.onOpenCameraClicked()
     }
 }
 
@@ -324,7 +324,7 @@ private fun HomeScreenDestinationPreview() {
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
             userPhotos = emptyList(),
-            onPhotoTakenToDb = {},
+            onSavePhotoTaken = {},
             onDeleteUserPhoto = {},
         )
     }

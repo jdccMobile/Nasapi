@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.mapLatest
 @OptIn(ExperimentalCoroutinesApi::class)
 class AstronomicEventLocalDataSource(
     private val astronomicEventDao: AstronomicEventDao,
-    private val astronomicEventPhotoDao: AstronomicEventPhotoDao
 ) {
     fun astronomicEvents(): Flow<List<AstronomicEvent>> =
         astronomicEventDao.getAllAstronomicEventList()
@@ -34,8 +33,8 @@ class AstronomicEventLocalDataSource(
     fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
         astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
 
-    fun getPhotosByEvent(eventId: String): Flow<List<AstronomicEventPhotoDb>> =
-        astronomicEventPhotoDao.getPhotosByEvent(eventId)
+//    fun getPhotosByEvent(eventId: String): Flow<List<AstronomicEventPhotoDb>> =
+//        astronomicEventPhotoDao.getPhotosByEvent(eventId)
 
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
         catch {
@@ -66,13 +65,13 @@ class AstronomicEventLocalDataSource(
             astronomicEventDao.insertAstronomicEvent(event.toDb())
         }.mapLeft { it.toMyError() }
 
-    suspend fun insertPhoto(photo: AstronomicEventPhotoDb) {
-        astronomicEventPhotoDao.insertPhoto(photo)
-    }
-
-    suspend fun deletePhoto(photo: AstronomicEventPhotoDb): Either<MyError, Unit> =
-        catch {
-            astronomicEventPhotoDao.deletePhoto(photo)
-        }.mapLeft { it.toMyError() }
+//    suspend fun insertPhoto(photo: AstronomicEventPhotoDb) {
+//        astronomicEventPhotoDao.insertPhoto(photo)
+//    }
+//
+//    suspend fun deletePhoto(photo: AstronomicEventPhotoDb): Either<MyError, Unit> =
+//        catch {
+//            astronomicEventPhotoDao.deletePhoto(photo)
+//        }.mapLeft { it.toMyError() }
 
 }

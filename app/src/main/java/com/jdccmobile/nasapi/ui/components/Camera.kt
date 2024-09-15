@@ -43,7 +43,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.domain.model.AstronomicEventId
+import com.jdccmobile.domain.model.AstronomicEventPhotoId
 import com.jdccmobile.nasapi.R
+import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.theme.Dimens
 import java.io.File
 import java.io.FileOutputStream
@@ -52,7 +54,7 @@ import java.util.UUID
 @Composable
 fun Camera(
     eventId: AstronomicEventId,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
     onCloseCamera: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -78,7 +80,7 @@ fun Camera(
             PhotoPreview(
                 eventId = eventId,
                 previewPhoto = previewPhoto!!,
-                onPhotoTakenToDb = onPhotoTakenToDb,
+                onSavePhotoTaken = onSavePhotoTaken,
                 onRemakePhoto = { previewPhoto = null },
                 context = context,
             )
@@ -118,7 +120,7 @@ private fun CameraView(
 private fun PhotoPreview(
     eventId: AstronomicEventId,
     previewPhoto: Bitmap,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
     onRemakePhoto: () -> Unit,
     context: Context,
     modifier: Modifier = Modifier,
@@ -133,7 +135,7 @@ private fun PhotoPreview(
         PreviewButtons(
             eventId = eventId.value,
             previewPhoto = previewPhoto,
-            onPhotoTakenToDb = onPhotoTakenToDb,
+            onSavePhotoTaken = onSavePhotoTaken,
             onRemakePhoto = onRemakePhoto,
             context = context,
         )
@@ -202,7 +204,7 @@ private fun BoxScope.MainButtons(
 private fun BoxScope.PreviewButtons(
     eventId: String,
     previewPhoto: Bitmap,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
     onRemakePhoto: () -> Unit,
     context: Context,
     modifier: Modifier = Modifier,
@@ -228,7 +230,7 @@ private fun BoxScope.PreviewButtons(
                 savePhotoLocally(
                     eventId,
                     previewPhoto,
-                    onPhotoTakenToDb,
+                    onSavePhotoTaken,
                     context,
                 )
             },
@@ -279,7 +281,7 @@ private fun takePhoto(
 private fun savePhotoLocally(
     eventId: String,
     previewImage: Bitmap,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
     context: Context,
 ) {
     val fileName = "photo_${System.currentTimeMillis()}.jpg"
@@ -287,10 +289,10 @@ private fun savePhotoLocally(
     FileOutputStream(file).use { out ->
         previewImage.compress(Bitmap.CompressFormat.JPEG, 100, out)
     }
-    onPhotoTakenToDb(
-        AstronomicEventPhotoDb(
-            photoId = UUID.randomUUID().toString(), // Genera un ID único
-            eventId = eventId,
+    onSavePhotoTaken(
+        AstronomicEventPhotoUi(
+            photoId = AstronomicEventPhotoId( UUID.randomUUID().toString()),
+            eventId = AstronomicEventId(eventId),
             filePath = file.absolutePath,
         ),
     )
