@@ -21,11 +21,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,15 +61,25 @@ fun Camera(
             )
         }
     }
+    var showPhotoPreviewButtons by remember { mutableStateOf(false) } // TODO mirar feina
+
     Box(modifier = modifier.fillMaxSize()) {
         CameraView(controller = controller)
-        CameraButtons(
-            controller = controller,
-            context = context,
-            onPhotoTakenToDb = onPhotoTaken,
-            onCloseCamera = onCloseCamera,
-            eventId = eventId.value,
-        )
+        if (showPhotoPreviewButtons) {
+            PreviewButtons(
+                eventId = eventId.value,
+                onPhotoTakenToDb = onPhotoTaken,
+                switchButtonsState = { showPhotoPreviewButtons = it },
+                context = context,
+                controller = controller,
+            )
+        } else {
+            MainButtons(
+                onCloseCamera = onCloseCamera,
+                switchButtonsState = { showPhotoPreviewButtons = it },
+                controller = controller,
+            )
+        }
     }
 }
 
@@ -87,13 +101,11 @@ private fun CameraView(
 }
 
 @Composable
-private fun BoxScope.CameraButtons(
-    controller: LifecycleCameraController,
-    context: Context,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+private fun BoxScope.MainButtons(
     onCloseCamera: () -> Unit,
+    switchButtonsState: (Boolean) -> Unit,
+    controller: LifecycleCameraController,
     modifier: Modifier = Modifier,
-    eventId: String,
 ) {
     Row(
         modifier = modifier
@@ -112,15 +124,7 @@ private fun BoxScope.CameraButtons(
             )
         }
         IconButton(
-            onClick = {
-                takePhoto(
-                    controller = controller,
-                    onPhotoTaken = { },
-                    onPhotoTakenToDb = onPhotoTakenToDb,
-                    context = context,
-                    eventId,
-                )
-            },
+            onClick = { switchButtonsState(true) },
         ) {
             Icon(
                 painterResource(R.drawable.ic_photo_camera),
@@ -140,6 +144,51 @@ private fun BoxScope.CameraButtons(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_camera_switch),
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.minTouchSize),
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.PreviewButtons(
+    eventId: String,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    switchButtonsState: (Boolean) -> Unit,
+    context: Context,
+    controller: LifecycleCameraController,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+    ) {
+        IconButton(
+            onClick = { switchButtonsState(false) },
+        ) {
+            Icon(
+                imageVector = Icons.Default.Clear,
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.minTouchSize),
+            )
+        }
+        IconButton(
+            onClick = {
+                takePhoto(
+                    controller = controller,
+                    onPhotoTaken = { },
+                    onPhotoTakenToDb = onPhotoTakenToDb,
+                    context = context,
+                    eventId,
+                )
+            },
+        ) {
+            Icon(
+                imageVector = Icons.Default.Check,
                 contentDescription = null,
                 modifier = Modifier.size(Dimens.minTouchSize),
             )
