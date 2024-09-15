@@ -11,6 +11,7 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -32,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -49,7 +52,7 @@ import java.util.UUID
 @Composable
 fun Camera(
     eventId: AstronomicEventId,
-    onPhotoTaken: (AstronomicEventPhotoDb) -> Unit,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
     onCloseCamera: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,23 +64,23 @@ fun Camera(
             )
         }
     }
-    var showPhotoPreviewButtons by remember { mutableStateOf(false) } // TODO mirar feina
+    var previewPhoto by remember { mutableStateOf<Bitmap?>(null) }
 
     Box(modifier = modifier.fillMaxSize()) {
-        CameraView(controller = controller)
-        if (showPhotoPreviewButtons) {
-            PreviewButtons(
-                eventId = eventId.value,
-                onPhotoTakenToDb = onPhotoTaken,
-                switchButtonsState = { showPhotoPreviewButtons = it },
-                context = context,
+        if (previewPhoto == null) {
+            CameraView(
+                onCloseCamera = onCloseCamera,
+                onShowPreview = { previewPhoto = it },
                 controller = controller,
+                context = context,
             )
         } else {
-            MainButtons(
-                onCloseCamera = onCloseCamera,
-                switchButtonsState = { showPhotoPreviewButtons = it },
-                controller = controller,
+            PhotoPreview(
+                eventId = eventId,
+                previewPhoto = previewPhoto!!,
+                onPhotoTakenToDb = onPhotoTakenToDb,
+                onRemakePhoto = { previewPhoto = null },
+                context = context,
             )
         }
     }
@@ -85,25 +88,63 @@ fun Camera(
 
 @Composable
 private fun CameraView(
+    onCloseCamera: () -> Unit,
+    onShowPreview: (Bitmap) -> Unit,
     controller: LifecycleCameraController,
+    context: Context,
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    AndroidView(
-        modifier = modifier.fillMaxSize(),
-        factory = {
-            PreviewView(it).apply {
-                this.controller = controller
-                controller.bindToLifecycle(lifecycleOwner)
-            }
-        },
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = modifier.fillMaxSize(),
+            factory = {
+                PreviewView(it).apply {
+                    this.controller = controller
+                    controller.bindToLifecycle(lifecycleOwner)
+                }
+            },
+        )
+        MainButtons(
+            onCloseCamera = onCloseCamera,
+            onShowPreview = { onShowPreview(it) },
+            controller = controller,
+            context = context,
+        )
+    }
+}
+
+@Composable
+private fun PhotoPreview(
+    eventId: AstronomicEventId,
+    previewPhoto: Bitmap,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    onRemakePhoto: () -> Unit,
+    context: Context,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        Image(
+            bitmap = previewPhoto.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        PreviewButtons(
+            eventId = eventId.value,
+            previewPhoto = previewPhoto,
+            onPhotoTakenToDb = onPhotoTakenToDb,
+            onRemakePhoto = onRemakePhoto,
+            context = context,
+        )
+    }
 }
 
 @Composable
 private fun BoxScope.MainButtons(
     onCloseCamera: () -> Unit,
-    switchButtonsState: (Boolean) -> Unit,
+    onShowPreview: (Bitmap) -> Unit,
+    context: Context,
     controller: LifecycleCameraController,
     modifier: Modifier = Modifier,
 ) {
@@ -124,7 +165,13 @@ private fun BoxScope.MainButtons(
             )
         }
         IconButton(
-            onClick = { switchButtonsState(true) },
+            onClick = {
+                takePhoto(
+                    onPhotoTaken = { onShowPreview(it) },
+                    controller = controller,
+                    context = context,
+                )
+            },
         ) {
             Icon(
                 painterResource(R.drawable.ic_photo_camera),
@@ -154,10 +201,10 @@ private fun BoxScope.MainButtons(
 @Composable
 private fun BoxScope.PreviewButtons(
     eventId: String,
+    previewPhoto: Bitmap,
     onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
-    switchButtonsState: (Boolean) -> Unit,
+    onRemakePhoto: () -> Unit,
     context: Context,
-    controller: LifecycleCameraController,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -168,7 +215,7 @@ private fun BoxScope.PreviewButtons(
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         IconButton(
-            onClick = { switchButtonsState(false) },
+            onClick = { onRemakePhoto() },
         ) {
             Icon(
                 imageVector = Icons.Default.Clear,
@@ -178,12 +225,11 @@ private fun BoxScope.PreviewButtons(
         }
         IconButton(
             onClick = {
-                takePhoto(
-                    controller = controller,
-                    onPhotoTaken = { },
-                    onPhotoTakenToDb = onPhotoTakenToDb,
-                    context = context,
+                savePhotoLocally(
                     eventId,
+                    previewPhoto,
+                    onPhotoTakenToDb,
+                    context,
                 )
             },
         ) {
@@ -197,11 +243,9 @@ private fun BoxScope.PreviewButtons(
 }
 
 private fun takePhoto(
-    controller: LifecycleCameraController,
     onPhotoTaken: (Bitmap) -> Unit,
-    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    controller: LifecycleCameraController,
     context: Context,
-    eventId: String,
 ) {
     controller.takePicture(
         ContextCompat.getMainExecutor(context),
@@ -220,16 +264,7 @@ private fun takePhoto(
                     matrix,
                     true,
                 )
-                val filePath = savePhotoLocally(context, rotatedBitmap)
                 onPhotoTaken(rotatedBitmap)
-
-                onPhotoTakenToDb(
-                    AstronomicEventPhotoDb(
-                        photoId = UUID.randomUUID().toString(), // Genera un ID único
-                        eventId = eventId,
-                        filePath = filePath,
-                    ),
-                )
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -241,11 +276,22 @@ private fun takePhoto(
 }
 
 
-private fun savePhotoLocally(context: Context, bitmap: Bitmap): String {
+private fun savePhotoLocally(
+    eventId: String,
+    previewImage: Bitmap,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
+    context: Context,
+) {
     val fileName = "photo_${System.currentTimeMillis()}.jpg"
     val file = File(context.filesDir, fileName)
     FileOutputStream(file).use { out ->
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        previewImage.compress(Bitmap.CompressFormat.JPEG, 100, out)
     }
-    return file.absolutePath
+    onPhotoTakenToDb(
+        AstronomicEventPhotoDb(
+            photoId = UUID.randomUUID().toString(), // Genera un ID único
+            eventId = eventId,
+            filePath = file.absolutePath,
+        ),
+    )
 }

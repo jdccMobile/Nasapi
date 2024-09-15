@@ -86,7 +86,7 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         userPhotos = userPhotos,
         onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
-        onPhotoTaken = viewModel::onPhotoTaken,
+        onPhotoTakenToDb = viewModel::onPhotoTakenToDb,
     )
 }
 
@@ -99,7 +99,7 @@ private fun DetailsContent(
     userPhotos: List<AstronomicEventPhotoDb>,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
-    onPhotoTaken: (AstronomicEventPhotoDb) -> Unit,
+    onPhotoTakenToDb: (AstronomicEventPhotoDb) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
@@ -117,7 +117,7 @@ private fun DetailsContent(
             if (showCameraView) {
                 Camera(
                     eventId = astronomicEvent?.id ?: AstronomicEventId(""),
-                    onPhotoTaken = onPhotoTaken,
+                    onPhotoTakenToDb = onPhotoTakenToDb,
                     onCloseCamera = {
                         // Todo add navigation
                     },
@@ -177,7 +177,7 @@ private fun EventDescription(
                 style = MaterialTheme.typography.bodySmall,
             )
 
-            HorizontalDivider(modifier = Modifier.padding(top = 24.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp))
         }
     }
 }
@@ -261,7 +261,7 @@ private fun HomeScreenDestinationPreview() {
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
             userPhotos = emptyList(),
-            onPhotoTaken = {},
+            onPhotoTakenToDb = {},
 
             )
     }

@@ -1,10 +1,6 @@
 package com.jdccmobile.nasapi.ui.features.details
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.data.local.datasource.AstronomicEventLocalDataSource
@@ -66,7 +62,7 @@ class DetailsViewModel(
         _showCameraView.value = true
     }
 
-    fun onPhotoTaken(photoDb: AstronomicEventPhotoDb) {
+    fun onPhotoTakenToDb(photoDb: AstronomicEventPhotoDb) {
         viewModelScope.launch {
             localDataSource.insertPhoto(photoDb)
             _showCameraView.value = false
