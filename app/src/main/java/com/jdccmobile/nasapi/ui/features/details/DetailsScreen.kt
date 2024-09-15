@@ -1,5 +1,14 @@
 package com.jdccmobile.nasapi.ui.features.details
 
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,13 +17,21 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,19 +39,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
+import com.jdccmobile.nasapi.ui.components.Camera
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.DetailsScaffold
 import com.jdccmobile.nasapi.ui.components.IconAndMessageInfo
 import com.jdccmobile.nasapi.ui.components.ImageWithErrorIcon
+import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -45,11 +69,34 @@ import java.time.LocalDate
 fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
     val astronomicEvent by viewModel.astronomicEvent.collectAsState()
     val isDataLoading by viewModel.isDataLoading.collectAsState()
+    val showCameraView by viewModel.showCameraView.collectAsState()
+    val userPhotos by viewModel.userPhotos.collectAsState()
+
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                viewModel.onOpenCameraClicked()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.camera_permission_denied),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        },
+    )
+
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
-        onFavoriteFabClicked = viewModel::onFavoriteFabClicked,
-        onTakePhotoFabClicked = viewModel::onTakePhotoFabClicked,
+        showCameraView = showCameraView,
+        userPhotos = userPhotos,
+        onFavoriteFabClicked = viewModel::onSwitchFavStatusClicked,
+        onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
+        onSavePhotoTaken = viewModel::onSavePhotoTaken,
+        onDeleteUserPhoto = viewModel::onDeletePhoto,
     )
 }
 
@@ -58,19 +105,20 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
 private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,
     isDataLoading: Boolean,
+    showCameraView: Boolean,
+    userPhotos: List<AstronomicEventPhotoUi>,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val showFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
-    val favoriteFabIcon = if (astronomicEvent?.isFavorite == true) {
-        Icons.Outlined.Favorite
-    } else {
-        Icons.Outlined.FavoriteBorder
-    }
+    val showBackFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
+    val favoriteFabIcon = getFavoriteFabIcon(astronomicEvent)
 
     DetailsScaffold(
-        showFab = showFab,
+        showBackFab = showBackFab,
+        showAllFabs = !showCameraView,
         favoriteFabIcon = favoriteFabIcon,
         onFavoriteFabClicked = onFavoriteFabClicked,
         onTakePhotoFabClicked = onTakePhotoFabClicked,
@@ -78,21 +126,31 @@ private fun DetailsContent(
         if (isDataLoading) {
             CircularProgressBar()
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy((-48).dp),
-                state = listState,
-            ) {
-                item {
-                    ImageWithErrorIcon(
-                        imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg",
-                        modifier = Modifier.height(400.dp),
-                    )
-                }
-                item {
-                    astronomicEvent?.let {
-                        EventDescription(
-                            astronomicEvent = it,
+            if (showCameraView) {
+                Camera(
+                    eventId = astronomicEvent?.id ?: AstronomicEventId(""),
+                    onSavePhotoTaken = onSavePhotoTaken,
+                    onCloseCamera = {
+                        // Todo add navigation
+                    },
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy((-48).dp),
+                    state = listState,
+                ) {
+                    item {
+                        ImageWithErrorIcon(
+                            imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg", // todo
+                            modifier = Modifier.height(400.dp),
+                        )
+                    }
+                    item { astronomicEvent?.let { EventDescription(astronomicEvent = it) } }
+                    item {
+                        MyPhotos(
+                            userPhotos = userPhotos,
+                            onDeleteUserPhoto = onDeleteUserPhoto,
                         )
                     }
                 }
@@ -137,26 +195,112 @@ private fun EventDescription(
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp))
+        }
+    }
+}
 
-            MyPhotos()
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MyPhotos(
+    userPhotos: List<AstronomicEventPhotoUi>,
+    onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp)) {
+        MyPhotosTitle()
+        if (userPhotos.isEmpty()) {
+            IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
+        } else {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(vertical = 16.dp),
+            ) {
+                items(userPhotos, key = { it.photoId.value }) { photo ->
+                    MyPhotoCard(
+                        photo = photo,
+                        onDeleteUserPhoto = onDeleteUserPhoto,
+                        modifier = Modifier.animateItemPlacement(),
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun MyPhotos(modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.my_photos),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-        // TODO hacer comprobacion de si hay fotos
-        IconAndMessageInfo(infoText = stringResource(R.string.there_are_no_photos))
+private fun MyPhotoCard(
+    photo: AstronomicEventPhotoUi,
+    onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val photoPath = BitmapFactory.decodeFile(photo.filePath)
+
+    Card(
+        onClick = {
+            // TODO open full image
+        },
+        modifier = modifier.height(200.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                bitmap = photoPath.asImageBitmap(),
+                contentDescription = null,
+            )
+            IconButton(
+                onClick = { onDeleteUserPhoto(photo) },
+                modifier = Modifier
+                    .size(Dimens.minTouchSize)
+                    .align(Alignment.TopEnd),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
     }
 }
+
+@Composable
+private fun MyPhotosTitle(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.my_photos),
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier.padding(bottom = 16.dp),
+    )
+}
+
+fun requestCameraPermission(
+    context: Context,
+    permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
+    viewModel: DetailsViewModel,
+) {
+    val permission = android.Manifest.permission.CAMERA
+    if (ContextCompat.checkSelfPermission(
+            context,
+            permission,
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        permissionLauncher.launch(permission)
+    } else {
+        viewModel.onOpenCameraClicked()
+    }
+}
+
+private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
+    if (astronomicEvent?.isFavorite == true) {
+        Icons.Outlined.Favorite
+    } else {
+        Icons.Outlined.FavoriteBorder
+    }
 
 @Preview
 @Composable
@@ -173,8 +317,12 @@ private fun HomeScreenDestinationPreview() {
                 hasImage = false,
             ),
             isDataLoading = false,
+            showCameraView = false,
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
+            userPhotos = emptyList(),
+            onSavePhotoTaken = {},
+            onDeleteUserPhoto = {},
         )
     }
 }

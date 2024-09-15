@@ -3,6 +3,8 @@ package com.jdccmobile.data.local.datasource
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import com.jdccmobile.data.local.dao.AstronomicEventDao
+import com.jdccmobile.data.local.dao.AstronomicEventPhotoDao
+import com.jdccmobile.data.local.model.AstronomicEventPhotoDb
 import com.jdccmobile.data.local.model.toDb
 import com.jdccmobile.data.local.model.toDomain
 import com.jdccmobile.data.utils.toMyError
@@ -14,7 +16,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicEventDao) {
+class AstronomicEventLocalDataSource(
+    private val astronomicEventDao: AstronomicEventDao,
+) {
     fun astronomicEvents(): Flow<List<AstronomicEvent>> =
         astronomicEventDao.getAllAstronomicEventList()
             .mapLatest { events -> events.map { it.toDomain() } }
@@ -26,9 +30,11 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             }
         }
 
-
     fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
         astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
+
+//    fun getPhotosByEvent(eventId: String): Flow<List<AstronomicEventPhotoDb>> =
+//        astronomicEventPhotoDao.getPhotosByEvent(eventId)
 
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
         catch {
@@ -58,4 +64,14 @@ class AstronomicEventLocalDataSource(private val astronomicEventDao: AstronomicE
             val event = astronomicEvent.copy(isFavorite = !astronomicEvent.isFavorite)
             astronomicEventDao.insertAstronomicEvent(event.toDb())
         }.mapLeft { it.toMyError() }
+
+//    suspend fun insertPhoto(photo: AstronomicEventPhotoDb) {
+//        astronomicEventPhotoDao.insertPhoto(photo)
+//    }
+//
+//    suspend fun deletePhoto(photo: AstronomicEventPhotoDb): Either<MyError, Unit> =
+//        catch {
+//            astronomicEventPhotoDao.deletePhoto(photo)
+//        }.mapLeft { it.toMyError() }
+
 }

@@ -26,6 +26,7 @@ immutableCollection = "0.3.5"
 roomVersion = "2.7.0-alpha07"
 kspVersion = "1.9.22-1.0.18"
 splashscreenVersion = "1.0.1"
+cameraXVersion = "1.3.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +34,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -47,7 +49,12 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreenVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraXVersion" }
+androidx-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraXVersion" }
+androidx-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraXVersion" }
+androidx-video = { group = "androidx.camera", name = "camera-video", version.ref = "cameraXVersion" }
+androidx-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraXVersion" }
+androidx-extensions = { group = "androidx.camera", name = "camera-extensions", version.ref = "cameraXVersion" }
 
 # Kotlinx Collection
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
