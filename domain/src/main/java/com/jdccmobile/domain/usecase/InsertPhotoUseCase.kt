@@ -8,5 +8,6 @@ import com.jdccmobile.domain.repository.AstronomicEventPhotoRepository
 class InsertPhotoUseCase(
     private val astronomicEventPhotoRepository: AstronomicEventPhotoRepository,
 ) {
-    suspend operator fun invoke(photo: AstronomicEventPhoto): Either<MyError, Unit> = astronomicEventPhotoRepository.insertPhoto(photo)
+    suspend operator fun invoke(photo: AstronomicEventPhoto): Either<MyError, Unit>
+    = astronomicEventPhotoRepository.insertPhoto(photo)
 }

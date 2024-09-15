@@ -62,7 +62,6 @@ import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import java.io.File
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
