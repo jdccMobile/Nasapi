@@ -3,8 +3,8 @@ package com.jdccmobile.nasapi.ui.features.details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEventId
-import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.GetAstronomicEventUseCase
 import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
 import com.jdccmobile.domain.usecase.InsertPhotoUseCase
 import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModel(
-//    private val astronomicEventId: AstronomicEventId, // todo
-    private val repository: AstronomicEventRepository,
+    private val astronomicEventId: String,
+    private val getAstronomicEventUseCase: GetAstronomicEventUseCase,
     private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
     getPhotosByEventUseCase: GetPhotosByEventUseCase,
     private val insertPhotoUseCase: InsertPhotoUseCase,
@@ -38,20 +38,19 @@ class DetailsViewModel(
     val showCameraView: StateFlow<Boolean> = _showCameraView.asStateFlow()
 
     val astronomicEvent: StateFlow<AstronomicEventUi?> =
-        repository.getAstronomicEventDetails(
-            AstronomicEventId("ae20240914"), // todo
-        ) // todo astronomicEventId
-            .mapLatest {
-                _isDataLoading.value = false
-                it.toUi()
-            }
+        getAstronomicEventUseCase(
+            AstronomicEventId(astronomicEventId),
+        ).mapLatest {
+            _isDataLoading.value = false
+            it.toUi()
+        }
             .onStart { _isDataLoading.value = true }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val userPhotos: StateFlow<List<AstronomicEventPhotoUi>> =
-        getPhotosByEventUseCase(AstronomicEventId("ae20240914")) // todo
+        getPhotosByEventUseCase(AstronomicEventId(astronomicEventId)) // todo
             .mapLatest { it.toUi() }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun onSwitchFavStatusClicked() {
         viewModelScope.launch {

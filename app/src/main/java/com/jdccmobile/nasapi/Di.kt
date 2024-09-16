@@ -14,6 +14,7 @@ import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
 import com.jdccmobile.domain.repository.AstronomicEventPhotoRepository
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.GetAstronomicEventUseCase
 import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
@@ -26,6 +27,7 @@ import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.compose.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
@@ -47,7 +49,16 @@ private val appModule = module {
 
     viewModelOf(::HomeViewModel)
     viewModelOf(::FavoritesViewModel)
-    viewModelOf(::DetailsViewModel)
+    viewModel { (astronomicEventId: String) ->
+        DetailsViewModel(
+            astronomicEventId = astronomicEventId,
+            switchEventFavoriteStatusUseCase = get(),
+            getPhotosByEventUseCase = get(),
+            insertPhotoUseCase = get(),
+            deletePhotoUseCase = get(),
+            getAstronomicEventUseCase = get(),
+        )
+    }
 }
 
 private val dataModule = module {
@@ -78,6 +89,7 @@ private val dataModule = module {
 
 private val domainModule = module {
     factoryOf(::RequestAstronomicEventsUseCase)
+    factoryOf(::GetAstronomicEventUseCase)
     factoryOf(::GetAstronomicEventsUseCase)
     factoryOf(::GetFavoriteAstronomicEventsUseCase)
     factoryOf(::SwitchEventFavoriteStatusUseCase)

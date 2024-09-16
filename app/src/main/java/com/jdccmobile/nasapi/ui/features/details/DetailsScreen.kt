@@ -62,11 +62,21 @@ import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
+fun DetailsScreen(
+    astronomicEventId: String,
+    onBackNavigation: () -> Unit,
+) {
+    val viewModel: DetailsViewModel = koinViewModel(
+        parameters = {
+            parametersOf(astronomicEventId)
+        },
+    )
+
     val astronomicEvent by viewModel.astronomicEvent.collectAsState()
     val isDataLoading by viewModel.isDataLoading.collectAsState()
     val showCameraView by viewModel.showCameraView.collectAsState()
@@ -97,6 +107,7 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onSavePhotoTaken = viewModel::onSavePhotoTaken,
         onDeleteUserPhoto = viewModel::onDeletePhoto,
+        onBackNavigation = onBackNavigation,
     )
 }
 
@@ -111,6 +122,7 @@ private fun DetailsContent(
     onTakePhotoFabClicked: () -> Unit,
     onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
     onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
+    onBackNavigation: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showBackFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
@@ -122,6 +134,7 @@ private fun DetailsContent(
         favoriteFabIcon = favoriteFabIcon,
         onFavoriteFabClicked = onFavoriteFabClicked,
         onTakePhotoFabClicked = onTakePhotoFabClicked,
+        onBackNavigation = onBackNavigation,
     ) {
         if (isDataLoading) {
             CircularProgressBar()
@@ -142,7 +155,7 @@ private fun DetailsContent(
                 ) {
                     item {
                         ImageWithErrorIcon(
-                            imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg", // todo
+                            imageUrl = astronomicEvent?.imageUrl,
                             modifier = Modifier.height(400.dp),
                         )
                     }
@@ -323,6 +336,7 @@ private fun HomeScreenDestinationPreview() {
             userPhotos = emptyList(),
             onSavePhotoTaken = {},
             onDeleteUserPhoto = {},
+            onBackNavigation = {},
         )
     }
 }

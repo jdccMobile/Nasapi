@@ -15,7 +15,7 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun InfiniteScrollLazyColumn(
     data: ImmutableList<AstronomicEventUi>,
-    onItemClick: () -> Unit,
+    onItemClick: (String) -> Unit,
     onLoadMoreItems: () -> Unit,
     isMoreDataLoading: Boolean,
     modifier: Modifier = Modifier,

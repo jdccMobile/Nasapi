@@ -1,6 +1,5 @@
 package com.jdccmobile.nasapi.ui.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +21,14 @@ import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import java.time.LocalDate
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardItem(
     astronomicEventUi: AstronomicEventUi,
-    onClick: () -> Unit,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        onClick = { onClick() },
+        onClick = { onClick(astronomicEventUi.id.value) },
         shape = MaterialTheme.shapes.medium,
         modifier = modifier
             .fillMaxWidth()

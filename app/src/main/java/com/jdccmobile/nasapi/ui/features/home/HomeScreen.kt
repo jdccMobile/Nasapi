@@ -24,7 +24,11 @@ import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
+fun HomeScreen(
+    navigateToFavorites: () -> Unit,
+    navigateToDetails: (String) -> Unit,
+    viewModel: HomeViewModel = koinViewModel(),
+) {
     val astronomicalEvents by viewModel.astronomicEvents.collectAsState()
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsState()
     val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsState()
@@ -35,9 +39,11 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
         isInitialDataLoading = isInitialDataLoading,
         isMoreDataLoading = isMoreDataLoading,
         errorMessage = errorMessage,
-        onAstronomicEventClicked = viewModel::onAstronomicEventClicked,
+//        onAstronomicEventClicked = viewModel::onAstronomicEventClicked,
         onLoadMoreItems = viewModel::onLoadMoreItems,
-        onFavoritesClicked = viewModel::onFavoritesClicked,
+//        onFavoritesClicked = viewModel::onFavoritesClicked,
+        navigateToDetails = navigateToDetails,
+        navigateToFavorites = navigateToFavorites,
     )
 }
 
@@ -47,9 +53,11 @@ private fun HomeContent(
     isInitialDataLoading: Boolean,
     isMoreDataLoading: Boolean,
     errorMessage: String?,
-    onAstronomicEventClicked: () -> Unit,
+//    onAstronomicEventClicked: () -> Unit,
+    navigateToDetails: (String) -> Unit,
     onLoadMoreItems: () -> Unit,
-    onFavoritesClicked: () -> Unit,
+//    onFavoritesClicked: () -> Unit,
+    navigateToFavorites: () -> Unit,
 ) {
     TopBarScaffold(
         title = stringResource(R.string.app_name),
@@ -57,7 +65,8 @@ private fun HomeContent(
             ActionIconButton(
                 icon = Icons.Default.Favorite,
                 onClick = {
-                    onFavoritesClicked()
+                    navigateToFavorites()
+//                    onFavoritesClicked()
                 },
             )
         },
@@ -66,7 +75,7 @@ private fun HomeContent(
             if (errorMessage.isNullOrEmpty()) {
                 InfiniteScrollLazyColumn(
                     data = astronomicEvents,
-                    onItemClick = onAstronomicEventClicked,
+                    onItemClick = navigateToDetails,
                     onLoadMoreItems = onLoadMoreItems,
                     isMoreDataLoading = isMoreDataLoading,
                 )
@@ -97,10 +106,11 @@ private fun HomeScreenDestinationPreview() {
             ).toImmutableList(),
             isInitialDataLoading = true,
             errorMessage = null,
-            onAstronomicEventClicked = {},
+            navigateToDetails = {},
             onLoadMoreItems = {},
             isMoreDataLoading = false,
-            onFavoritesClicked = {},
+            navigateToFavorites = {},
+//            onFavoritesClicked = {},
         )
     }
 }

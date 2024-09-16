@@ -84,6 +84,7 @@ fun TopBarScaffold(
 @Composable
 fun TopBarWithNavigationScaffold(
     title: String,
+    onBackNavigation: () -> Unit,
     modifier: Modifier = Modifier,
     actions: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -97,9 +98,7 @@ fun TopBarWithNavigationScaffold(
                 ),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            // TODO navegar atras
-                        },
+                        onClick = { onBackNavigation() },
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -134,9 +133,10 @@ fun DetailsScaffold(
     showBackFab: Boolean,
     showAllFabs: Boolean,
     favoriteFabIcon: ImageVector,
-    modifier: Modifier = Modifier,
     onFavoriteFabClicked: () -> Unit,
+    onBackNavigation: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -176,9 +176,7 @@ fun DetailsScaffold(
             if (showAllFabs) {
                 AnimatedVisibility(visible = showBackFab, enter = fadeIn(), exit = fadeOut()) {
                     FloatingActionButton(
-                        onClick = {
-                            // TODO add navigation
-                        },
+                        onClick = { onBackNavigation() },
                         containerColor = MaterialTheme.colorScheme.surface,
                         contentColor = Color.White,
                         modifier = Modifier
@@ -224,6 +222,6 @@ private fun TopBarScaffoldPreview() {
 @Composable
 private fun TopBarWithNavigationScaffoldPreview() {
     NasapiTheme {
-        TopBarWithNavigationScaffold("Favorites") {}
+        TopBarWithNavigationScaffold("Favorites", onBackNavigation = {}) {}
     }
 }

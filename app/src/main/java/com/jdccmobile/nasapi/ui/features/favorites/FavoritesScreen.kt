@@ -29,13 +29,17 @@ import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun FavoritesScreen(viewModel: FavoritesViewModel = koinViewModel()) {
+fun FavoritesScreen(
+    viewModel: FavoritesViewModel = koinViewModel(),
+    onBackNavigation: () -> Unit,
+) {
     val favoriteEvents by viewModel.favoriteEvents.collectAsState()
     val isDataLoading by viewModel.isDataLoading.collectAsState()
     FavoritesContent(
         favoriteEvents = favoriteEvents.toImmutableList(),
         isDataLoading = isDataLoading,
         onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
+        onBackNavigation = onBackNavigation,
     )
 }
 
@@ -44,9 +48,11 @@ private fun FavoritesContent(
     favoriteEvents: ImmutableList<AstronomicEventUi>,
     isDataLoading: Boolean,
     onFavoriteEventClicked: () -> Unit,
+    onBackNavigation: () -> Unit,
 ) {
     TopBarWithNavigationScaffold(
         title = stringResource(R.string.favorites),
+        onBackNavigation = onBackNavigation,
     ) {
         if (!isDataLoading) {
             if (favoriteEvents.isNotEmpty()) {
@@ -93,6 +99,7 @@ private fun HomeScreenDestinationPreview() {
             ).toImmutableList(),
             isDataLoading = false,
             onFavoriteEventClicked = {},
+            onBackNavigation = {},
         )
     }
 }
