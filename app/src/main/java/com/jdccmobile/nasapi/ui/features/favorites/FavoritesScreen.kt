@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
-import com.jdccmobile.nasapi.ui.components.CardItem
+import com.jdccmobile.nasapi.ui.components.AstronomicEventItem
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.InfoError
 import com.jdccmobile.nasapi.ui.components.TopBarWithNavigationScaffold
@@ -63,7 +63,7 @@ private fun FavoritesContent(
                         .padding(Dimens.appPadding),
                 ) {
                     items(favoriteEvents) { event ->
-                        CardItem(
+                        AstronomicEventItem(
                             astronomicEventUi = event,
                             onClick = { onFavoriteEventClicked() },
                         )

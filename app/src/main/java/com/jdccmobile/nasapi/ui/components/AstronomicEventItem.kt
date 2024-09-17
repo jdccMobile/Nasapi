@@ -22,7 +22,7 @@ import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import java.time.LocalDate
 
 @Composable
-fun CardItem(
+fun AstronomicEventItem(
     astronomicEventUi: AstronomicEventUi,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -71,7 +71,7 @@ fun CardItem(
 @Composable
 private fun CardItemPreview() {
     NasapiTheme {
-        CardItem(
+        AstronomicEventItem(
             astronomicEventUi = AstronomicEventUi(
                 id = AstronomicEventId("1"),
                 title = "Prueba",

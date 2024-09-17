@@ -30,7 +30,7 @@ fun InfiniteScrollLazyColumn(
             if (index == data.lastIndex) {
                 onLoadMoreItems()
             }
-            CardItem(
+            AstronomicEventItem(
                 astronomicEventUi = event,
                 onClick = onItemClick,
             )
