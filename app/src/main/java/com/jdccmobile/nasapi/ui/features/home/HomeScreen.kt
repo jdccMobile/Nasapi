@@ -35,7 +35,6 @@ fun HomeScreen(
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
     val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
-    println("thereIsFavEvents: $thereIsFavEvents")
 
     HomeContent(
         astronomicEvents = astronomicalEvents.toImmutableList(),
