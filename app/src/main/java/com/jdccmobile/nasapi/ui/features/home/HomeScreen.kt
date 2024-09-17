@@ -2,14 +2,12 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.ActionIconButton
@@ -32,11 +30,11 @@ fun HomeScreen(
     navigateToDetails: (String) -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
-    val astronomicalEvents by viewModel.astronomicEvents.collectAsState()
-    val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsState()
-    val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsState()
-    val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
+    val astronomicalEvents by viewModel.astronomicEvents.collectAsStateWithLifecycle()
+    val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
+    val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
+    val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     println("thereIsFavEvents: $thereIsFavEvents")
 
     HomeContent(
