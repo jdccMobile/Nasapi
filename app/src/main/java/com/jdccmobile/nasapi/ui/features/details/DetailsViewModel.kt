@@ -3,11 +3,11 @@ package com.jdccmobile.nasapi.ui.features.details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEventId
-import com.jdccmobile.domain.usecase.DeletePhotoUseCase
-import com.jdccmobile.domain.usecase.GetAstronomicEventUseCase
-import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
-import com.jdccmobile.domain.usecase.InsertPhotoUseCase
-import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
+import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toDomain

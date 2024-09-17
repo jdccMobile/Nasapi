@@ -22,6 +22,8 @@ class AstronomicEventRepositoryImpl(
     override val favoriteAstronomicEvents: Flow<List<AstronomicEvent>> =
         localDataSource.favoriteAstronomicEvents()
 
+    override val thereIsFavEvents: Flow<Boolean> = localDataSource.getIfThereIsFavEvents()
+
     override fun getAstronomicEventDetails(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
         localDataSource.getAstronomicEvent(astronomicEventId)
 

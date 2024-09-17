@@ -13,14 +13,15 @@ import com.jdccmobile.data.repository.AstronomicEventRepositoryImpl
 import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
 import com.jdccmobile.domain.repository.AstronomicEventPhotoRepository
 import com.jdccmobile.domain.repository.AstronomicEventRepository
-import com.jdccmobile.domain.usecase.DeletePhotoUseCase
-import com.jdccmobile.domain.usecase.GetAstronomicEventUseCase
-import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
-import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
-import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
-import com.jdccmobile.domain.usecase.InsertPhotoUseCase
-import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
-import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetFavoriteAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetIfThereIsFavEventsUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
+import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
@@ -93,6 +94,8 @@ private val domainModule = module {
     factoryOf(::GetAstronomicEventsUseCase)
     factoryOf(::GetFavoriteAstronomicEventsUseCase)
     factoryOf(::SwitchEventFavoriteStatusUseCase)
+    factoryOf(::GetIfThereIsFavEventsUseCase)
+
     factoryOf(::GetPhotosByEventUseCase)
     factoryOf(::InsertPhotoUseCase)
     factoryOf(::DeletePhotoUseCase)

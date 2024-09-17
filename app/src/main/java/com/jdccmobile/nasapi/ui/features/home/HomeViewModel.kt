@@ -2,14 +2,16 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
-import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetIfThereIsFavEventsUseCase
+import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
 import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,15 +22,18 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
     private val requestAstronomicEventsUseCase: RequestAstronomicEventsUseCase,
     getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
+    getIfThereIsFavEventsUseCase: GetIfThereIsFavEventsUseCase,
 ) : ViewModel() {
     val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
         getAstronomicEventsUseCase().mapLatest { events ->
             events.toUi().toSet()
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
+
+    val thereIsFavEvents: StateFlow<Boolean> = getIfThereIsFavEventsUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitialDataLoading: StateFlow<Boolean> = _isInitialDataLoading.asStateFlow()

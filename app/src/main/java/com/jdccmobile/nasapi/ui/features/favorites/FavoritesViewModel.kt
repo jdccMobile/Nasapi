@@ -2,7 +2,7 @@ package com.jdccmobile.nasapi.ui.features.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.usecase.GetFavoriteAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
 import kotlinx.coroutines.ExperimentalCoroutinesApi

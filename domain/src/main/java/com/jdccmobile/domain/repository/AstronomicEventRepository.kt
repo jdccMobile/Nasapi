@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface AstronomicEventRepository {
     val astronomicEvents: Flow<List<AstronomicEvent>>
     val favoriteAstronomicEvents: Flow<List<AstronomicEvent>>
+    val thereIsFavEvents: Flow<Boolean>
 
     fun getAstronomicEventDetails(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent>
 

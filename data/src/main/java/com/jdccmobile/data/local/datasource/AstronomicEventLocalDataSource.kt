@@ -30,18 +30,22 @@ class AstronomicEventLocalDataSource(
             }
         }
 
+    fun getIfThereIsFavEvents(): Flow<Boolean> =
+        astronomicEventDao.getFavoriteAstronomicEventCount().mapLatest { favEventsCount ->
+            favEventsCount > 0
+        }
+
     fun getAstronomicEvent(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> =
         astronomicEventDao.getAstronomicEvent(astronomicEventId.value).mapLatest { it.toDomain() }
-
-//    fun getPhotosByEvent(eventId: String): Flow<List<AstronomicEventPhotoDb>> =
-//        astronomicEventPhotoDao.getPhotosByEvent(eventId)
 
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEvent): Either<MyError, Unit> =
         catch {
             astronomicEventDao.insertAstronomicEvent(astronomicEvent.toDb())
         }.mapLeft { it.toMyError() }
 
-    suspend fun insertAstronomicEventList(astronomicEventList: List<AstronomicEvent>): Either<MyError, Unit> =
+    suspend fun insertAstronomicEventList(
+        astronomicEventList: List<AstronomicEvent>
+    ): Either<MyError, Unit> =
         catch {
             astronomicEventDao.insertAstronomicEventList(astronomicEventList.map { it.toDb() })
         }.mapLeft { it.toMyError() }
@@ -64,14 +68,4 @@ class AstronomicEventLocalDataSource(
             val event = astronomicEvent.copy(isFavorite = !astronomicEvent.isFavorite)
             astronomicEventDao.insertAstronomicEvent(event.toDb())
         }.mapLeft { it.toMyError() }
-
-//    suspend fun insertPhoto(photo: AstronomicEventPhotoDb) {
-//        astronomicEventPhotoDao.insertPhoto(photo)
-//    }
-//
-//    suspend fun deletePhoto(photo: AstronomicEventPhotoDb): Either<MyError, Unit> =
-//        catch {
-//            astronomicEventPhotoDao.deletePhoto(photo)
-//        }.mapLeft { it.toMyError() }
-
 }

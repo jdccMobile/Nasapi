@@ -9,9 +9,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AstronomicEventDao {
+    @Query("SELECT * FROM astronomic_events_table WHERE id = :astronomicEventId")
+    fun getAstronomicEvent(astronomicEventId: String): Flow<AstronomicEventDb>
+
     @Query("SELECT * FROM astronomic_events_table ORDER BY date DESC")
     fun getAllAstronomicEventList(
     ): Flow<List<AstronomicEventDb>>
+
+    @Query("SELECT * FROM astronomic_events_table WHERE is_favorite = true ORDER BY date ASC")
+    fun getFavoriteAstronomicEventList(): Flow<List<AstronomicEventDb>>
+
+    @Query("SELECT COUNT(id) FROM astronomic_events_table WHERE is_favorite = true ")
+    fun getFavoriteAstronomicEventCount(): Flow<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAstronomicEvent(astronomicEvent: AstronomicEventDb)
@@ -19,17 +28,11 @@ interface AstronomicEventDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAstronomicEventList(astronomicEventList: List<AstronomicEventDb>)
 
-    @Query("SELECT * FROM astronomic_events_table WHERE id = :astronomicEventId")
-    fun getAstronomicEvent(astronomicEventId: String): Flow<AstronomicEventDb>
-
     @Query("SELECT * FROM astronomic_events_table WHERE date >= :startDate AND date <= :endDate ORDER BY date ASC")
     suspend fun getAstronomicEventList(
         startDate: String,
         endDate: String,
     ): List<AstronomicEventDb>
-
-    @Query("SELECT * FROM astronomic_events_table WHERE is_favorite = true ORDER BY date ASC")
-    fun getFavoriteAstronomicEventList(): Flow<List<AstronomicEventDb>>
 
     @Query("SELECT COUNT(id) FROM astronomic_events_table WHERE date >= :startDate AND date <= :endDate")
     suspend fun countEventsInWeek(

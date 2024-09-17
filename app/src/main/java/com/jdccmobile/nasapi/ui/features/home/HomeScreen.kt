@@ -2,6 +2,9 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,18 +33,19 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val astronomicalEvents by viewModel.astronomicEvents.collectAsState()
+    val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsState()
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsState()
     val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    println("thereIsFavEvents: $thereIsFavEvents")
 
     HomeContent(
         astronomicEvents = astronomicalEvents.toImmutableList(),
+        thereIsFavEvents = thereIsFavEvents,
         isInitialDataLoading = isInitialDataLoading,
         isMoreDataLoading = isMoreDataLoading,
         errorMessage = errorMessage,
-//        onAstronomicEventClicked = viewModel::onAstronomicEventClicked,
         onLoadMoreItems = viewModel::onLoadMoreItems,
-//        onFavoritesClicked = viewModel::onFavoritesClicked,
         navigateToDetails = navigateToDetails,
         navigateToFavorites = navigateToFavorites,
     )
@@ -50,23 +54,25 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     astronomicEvents: ImmutableList<AstronomicEventUi>,
+    thereIsFavEvents: Boolean,
     isInitialDataLoading: Boolean,
     isMoreDataLoading: Boolean,
     errorMessage: String?,
-//    onAstronomicEventClicked: () -> Unit,
     navigateToDetails: (String) -> Unit,
     onLoadMoreItems: () -> Unit,
-//    onFavoritesClicked: () -> Unit,
     navigateToFavorites: () -> Unit,
 ) {
     TopBarScaffold(
         title = stringResource(R.string.app_name),
         actions = {
             ActionIconButton(
-                icon = Icons.Default.Favorite,
+                icon = if(thereIsFavEvents) {
+                    Icons.Default.Favorite
+                } else {
+                    Icons.Outlined.FavoriteBorder
+                },
                 onClick = {
                     navigateToFavorites()
-//                    onFavoritesClicked()
                 },
             )
         },
@@ -104,13 +110,13 @@ private fun HomeScreenDestinationPreview() {
                     hasImage = false,
                 ),
             ).toImmutableList(),
+            thereIsFavEvents = false,
             isInitialDataLoading = true,
             errorMessage = null,
             navigateToDetails = {},
             onLoadMoreItems = {},
             isMoreDataLoading = false,
             navigateToFavorites = {},
-//            onFavoritesClicked = {},
         )
     }
 }

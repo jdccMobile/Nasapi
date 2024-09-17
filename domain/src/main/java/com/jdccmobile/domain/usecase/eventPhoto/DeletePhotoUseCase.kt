@@ -1,4 +1,4 @@
-package com.jdccmobile.domain.usecase
+package com.jdccmobile.domain.usecase.eventPhoto
 
 import arrow.core.Either
 import com.jdccmobile.domain.model.AstronomicEventPhoto

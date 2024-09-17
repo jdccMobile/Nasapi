@@ -1,4 +1,4 @@
-package com.jdccmobile.domain.usecase
+package com.jdccmobile.domain.usecase.eventPhoto
 
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.AstronomicEventPhoto
