@@ -11,7 +11,6 @@ import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,8 +40,8 @@ class HomeViewModel(
     private val _isMoreDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isMoreDataLoading: StateFlow<Boolean> = _isMoreDataLoading.asStateFlow()
 
-    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    private val _error: MutableStateFlow<ErrorUi?> = MutableStateFlow(null)
+    val error: StateFlow<ErrorUi?> = _error.asStateFlow()
 
     fun onLoadMoreItems() {
         if (!_isMoreDataLoading.value) {
@@ -52,6 +51,7 @@ class HomeViewModel(
                     requestAstronomicEvents(
                         startDate = nextWeekToLoad.getFirstDayOfWeek(),
                         endDate = nextWeekToLoad.getLastDayOfWeek(),
+                        LoadingType.LoadingMoreData,
                     )
                 }
                 _isMoreDataLoading.value = false
@@ -79,6 +79,7 @@ class HomeViewModel(
             requestAstronomicEvents(
                 startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
+                loadingType = LoadingType.InitialLoading,
             )
             _isInitialDataLoading.value = false
         }
@@ -88,15 +89,29 @@ class HomeViewModel(
     private suspend fun requestAstronomicEvents(
         startDate: LocalDate,
         endDate: LocalDate,
+        loadingType: LoadingType,
     ) {
         requestAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
         ).fold(
             ifLeft = { error ->
-                _errorMessage.value = error.toMessage()
+                _error.value = ErrorUi(error.toMessage(), loadingType)
             },
-            ifRight = { nextWeekToLoad = startDate.minusWeeks(1) },
+            ifRight = {
+                nextWeekToLoad = startDate.minusWeeks(1)
+                _error.value = null
+            },
         )
     }
+}
+
+data class ErrorUi(
+    val message: String,
+    val type: LoadingType,
+)
+
+enum class LoadingType {
+    InitialLoading,
+    LoadingMoreData
 }

@@ -34,14 +34,14 @@ fun HomeScreen(
     val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
     val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsStateWithLifecycle()
-    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
 
     HomeContent(
         astronomicEvents = astronomicalEvents.toImmutableList(),
         thereIsFavEvents = thereIsFavEvents,
         isInitialDataLoading = isInitialDataLoading,
         isMoreDataLoading = isMoreDataLoading,
-        errorMessage = errorMessage,
+        error = error,
         onLoadMoreItems = viewModel::onLoadMoreItems,
         navigateToDetails = navigateToDetails,
         navigateToFavorites = navigateToFavorites,
@@ -54,7 +54,7 @@ private fun HomeContent(
     thereIsFavEvents: Boolean,
     isInitialDataLoading: Boolean,
     isMoreDataLoading: Boolean,
-    errorMessage: String?,
+    error: ErrorUi?,
     navigateToDetails: (String) -> Unit,
     onLoadMoreItems: () -> Unit,
     navigateToFavorites: () -> Unit,
@@ -75,15 +75,16 @@ private fun HomeContent(
         },
     ) {
         if (!isInitialDataLoading) {
-            if (errorMessage.isNullOrEmpty()) {
+            if (error?.type != LoadingType.InitialLoading) {
                 InfiniteScrollLazyColumn(
                     data = astronomicEvents,
                     onItemClick = navigateToDetails,
                     onLoadMoreItems = onLoadMoreItems,
                     isMoreDataLoading = isMoreDataLoading,
+                    error = error,
                 )
             } else {
-                InfoError(errorMessage = errorMessage, errorIconId = R.drawable.ic_error)
+                InfoError(errorMessage = error.message, errorIconId = R.drawable.ic_error)
             }
         } else {
             CircularProgressBar()
@@ -109,7 +110,7 @@ private fun HomeScreenDestinationPreview() {
             ).toImmutableList(),
             thereIsFavEvents = false,
             isInitialDataLoading = true,
-            errorMessage = null,
+            error = null,
             navigateToDetails = {},
             onLoadMoreItems = {},
             isMoreDataLoading = false,
