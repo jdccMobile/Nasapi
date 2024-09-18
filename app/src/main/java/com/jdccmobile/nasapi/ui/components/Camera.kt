@@ -46,14 +46,14 @@ import com.jdccmobile.domain.model.AstronomicEventPhotoId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.theme.Dimens
+import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 
 @Composable
 fun Camera(
     eventId: AstronomicEventId,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onCloseCamera: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -119,7 +119,7 @@ private fun CameraView(
 private fun PhotoPreview(
     eventId: AstronomicEventId,
     previewPhoto: Bitmap,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onRemakePhoto: () -> Unit,
     context: Context,
     modifier: Modifier = Modifier,
@@ -203,7 +203,7 @@ private fun BoxScope.MainButtons(
 private fun BoxScope.PreviewButtons(
     eventId: String,
     previewPhoto: Bitmap,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onRemakePhoto: () -> Unit,
     context: Context,
     modifier: Modifier = Modifier,
@@ -226,7 +226,7 @@ private fun BoxScope.PreviewButtons(
         }
         IconButton(
             onClick = {
-                savePhotoLocally(
+                getDataToSavePhotoLocally(
                     eventId,
                     previewPhoto,
                     onSavePhotoTaken,
@@ -277,22 +277,26 @@ private fun takePhoto(
 }
 
 @Suppress("MagicNumber")
-private fun savePhotoLocally(
+private fun getDataToSavePhotoLocally(
     eventId: String,
     previewImage: Bitmap,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     context: Context,
 ) {
     val fileName = "photo_${System.currentTimeMillis()}.jpg"
     val file = File(context.filesDir, fileName)
-    FileOutputStream(file).use { out ->
-        previewImage.compress(Bitmap.CompressFormat.JPEG, 100, out)
-    }
+
+    val stream = ByteArrayOutputStream()
+    previewImage.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+    val imageData = stream.toByteArray()
+
     onSavePhotoTaken(
         AstronomicEventPhotoUi(
             photoId = AstronomicEventPhotoId(UUID.randomUUID().toString()),
             eventId = AstronomicEventId(eventId),
             filePath = file.absolutePath,
         ),
+        file,
+        imageData
     )
 }

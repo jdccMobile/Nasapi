@@ -21,13 +21,14 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModel(
-    private val astronomicEventId: String,
-    private val getAstronomicEventUseCase: GetAstronomicEventUseCase,
-    private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
+    astronomicEventId: String,
+    getAstronomicEventUseCase: GetAstronomicEventUseCase,
     getPhotosByEventUseCase: GetPhotosByEventUseCase,
+    private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
     private val insertPhotoUseCase: InsertPhotoUseCase,
     private val deletePhotoUseCase: DeletePhotoUseCase,
 ) : ViewModel() {
@@ -62,9 +63,9 @@ class DetailsViewModel(
         _showCameraView.value = true
     }
 
-    fun onSavePhotoTaken(photo: AstronomicEventPhotoUi) {
+    fun onSavePhotoTaken(photo: AstronomicEventPhotoUi, file: File, imageToSave: ByteArray) {
         viewModelScope.launch {
-            insertPhotoUseCase(photo.toDomain())
+            insertPhotoUseCase(photo.toDomain(), file, imageToSave)
             _showCameraView.value = false
         }
     }

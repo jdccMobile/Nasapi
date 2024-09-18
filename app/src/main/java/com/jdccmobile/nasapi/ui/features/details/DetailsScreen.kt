@@ -63,6 +63,7 @@ import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.parameter.parametersOf
+import java.io.File
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
@@ -120,7 +121,7 @@ private fun DetailsContent(
     userPhotos: List<AstronomicEventPhotoUi>,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
     onBackNavigation: () -> Unit,
 ) {
@@ -232,7 +233,7 @@ fun MyPhotos(
                     MyPhotoCard(
                         photo = photo,
                         onDeleteUserPhoto = onDeleteUserPhoto,
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                     )
                 }
             }
@@ -334,7 +335,7 @@ private fun HomeScreenDestinationPreview() {
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
             userPhotos = emptyList(),
-            onSavePhotoTaken = {},
+            onSavePhotoTaken = { _, _, _ -> },
             onDeleteUserPhoto = {},
             onBackNavigation = {},
         )
