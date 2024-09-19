@@ -21,15 +21,29 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun HomeScreen(
+fun HomeDestination(
     navigateToFavorites: () -> Unit,
     navigateToDetails: (String) -> Unit,
-    viewModel: HomeViewModel = koinViewModel(),
 ) {
+    val screenActions = HomeScreenActions(
+        navigateToFavorites = navigateToFavorites,
+        navigateToDetails = navigateToDetails
+    )
+    val viewModel: HomeViewModel = koinViewModel(
+        parameters = {
+            parametersOf(screenActions)
+        }
+    )
+    HomeScreen(viewModel = viewModel)
+}
+
+@Composable
+private fun HomeScreen( viewModel: HomeViewModel){
     val astronomicalEvents by viewModel.astronomicEvents.collectAsStateWithLifecycle()
     val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
@@ -43,8 +57,8 @@ fun HomeScreen(
         isMoreDataLoading = isMoreDataLoading,
         error = error,
         onLoadMoreItems = viewModel::onLoadMoreItems,
-        navigateToDetails = navigateToDetails,
-        navigateToFavorites = navigateToFavorites,
+        navigateToDetails = viewModel::onAstronomicEventClicked,
+        navigateToFavorites = viewModel::onFavoritesClicked,
     )
 }
 

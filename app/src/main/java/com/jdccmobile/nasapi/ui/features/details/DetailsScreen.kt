@@ -71,12 +71,13 @@ import java.time.LocalDate
 fun DetailsScreen(
     astronomicEventId: String,
     onBackNavigation: () -> Unit,
-) {
-    val viewModel: DetailsViewModel = koinViewModel(
+    viewModel: DetailsViewModel = koinViewModel(
         parameters = {
             parametersOf(astronomicEventId)
         },
     )
+) {
+
 
     val astronomicEvent by viewModel.astronomicEvent.collectAsStateWithLifecycle()
     val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()

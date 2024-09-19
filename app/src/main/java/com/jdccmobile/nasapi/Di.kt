@@ -24,6 +24,7 @@ import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
+import com.jdccmobile.nasapi.ui.features.home.HomeScreenActions
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -48,7 +49,14 @@ fun Application.initDi() {
 private val appModule = module {
     single(named(API_KEY_NAMED)) { androidApplication().getString(R.string.api_key) }
 
-    viewModelOf(::HomeViewModel)
+    viewModel { (screenActions: HomeScreenActions) ->
+        HomeViewModel(
+            screenActions = screenActions,
+            requestAstronomicEventsUseCase = get(),
+            getAstronomicEventsUseCase = get(),
+            getIfThereIsFavEventsUseCase = get(),
+        )
+    }
     viewModelOf(::FavoritesViewModel)
     viewModel { (astronomicEventId: String) ->
         DetailsViewModel(
