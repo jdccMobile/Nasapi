@@ -26,6 +26,7 @@ import java.io.File
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModel(
     astronomicEventId: String,
+    private val screenActions: DetailsScreenActions,
     getAstronomicEventUseCase: GetAstronomicEventUseCase,
     getPhotosByEventUseCase: GetPhotosByEventUseCase,
     private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
@@ -75,4 +76,12 @@ class DetailsViewModel(
             deletePhotoUseCase(photo.toDomain())
         }
     }
+
+    fun onNavBack(){
+        screenActions.onNavBack()
+    }
 }
+
+data class DetailsScreenActions(
+    val onNavBack: () -> Unit,
+)

@@ -68,21 +68,19 @@ import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun DetailsScreen(
+fun DetailsDestination(
     astronomicEventId: String,
-    onBackNavigation: () -> Unit,
-    viewModel: DetailsViewModel = koinViewModel(
+    onNavBack: () -> Unit,
+) {
+    val screenActions = DetailsScreenActions(
+        onNavBack = onNavBack,
+    )
+
+    val viewModel: DetailsViewModel = koinViewModel(
         parameters = {
-            parametersOf(astronomicEventId)
+            parametersOf(astronomicEventId, screenActions)
         },
     )
-) {
-
-
-    val astronomicEvent by viewModel.astronomicEvent.collectAsStateWithLifecycle()
-    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
-    val showCameraView by viewModel.showCameraView.collectAsStateWithLifecycle()
-    val userPhotos by viewModel.userPhotos.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -100,6 +98,20 @@ fun DetailsScreen(
         },
     )
 
+    DetailsScreen(viewModel = viewModel, permissionLauncher = permissionLauncher)
+}
+
+@Composable
+fun DetailsScreen(
+    viewModel: DetailsViewModel,
+    permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
+) {
+    val context = LocalContext.current
+    val astronomicEvent by viewModel.astronomicEvent.collectAsStateWithLifecycle()
+    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
+    val showCameraView by viewModel.showCameraView.collectAsStateWithLifecycle()
+    val userPhotos by viewModel.userPhotos.collectAsStateWithLifecycle()
+
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
@@ -109,9 +121,10 @@ fun DetailsScreen(
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onSavePhotoTaken = viewModel::onSavePhotoTaken,
         onDeleteUserPhoto = viewModel::onDeletePhoto,
-        onBackNavigation = onBackNavigation,
+        onBackNavigation = viewModel::onNavBack,
     )
 }
+
 
 @Suppress("MagicNumber")
 @Composable

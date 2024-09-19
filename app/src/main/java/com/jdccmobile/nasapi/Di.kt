@@ -22,6 +22,7 @@ import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
 import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
 import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
+import com.jdccmobile.nasapi.ui.features.details.DetailsScreenActions
 import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeScreenActions
@@ -58,9 +59,10 @@ private val appModule = module {
         )
     }
     viewModelOf(::FavoritesViewModel)
-    viewModel { (astronomicEventId: String) ->
+    viewModel { (astronomicEventId: String, screenActions: DetailsScreenActions) ->
         DetailsViewModel(
             astronomicEventId = astronomicEventId,
+            screenActions = screenActions,
             switchEventFavoriteStatusUseCase = get(),
             getPhotosByEventUseCase = get(),
             insertPhotoUseCase = get(),

@@ -31,7 +31,7 @@ import java.time.LocalDate
 @Composable
 fun FavoritesScreen(
     viewModel: FavoritesViewModel = koinViewModel(),
-    onBackNavigation: () -> Unit,
+    onNavBack: () -> Unit,
 ) {
     val favoriteEvents by viewModel.favoriteEvents.collectAsStateWithLifecycle()
     val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
@@ -39,7 +39,7 @@ fun FavoritesScreen(
         favoriteEvents = favoriteEvents.toImmutableList(),
         isDataLoading = isDataLoading,
         onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
-        onBackNavigation = onBackNavigation,
+        onBackNavigation = onNavBack,
     )
 }
 
