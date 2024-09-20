@@ -2,7 +2,6 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.usecase.events.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.GetIfThereIsFavEventsUseCase
 import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
@@ -120,5 +119,5 @@ data class ErrorUi(
 
 enum class LoadingType {
     InitialLoading,
-    LoadingMoreData
+    LoadingMoreData,
 }

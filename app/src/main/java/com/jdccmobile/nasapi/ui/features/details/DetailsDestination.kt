@@ -126,8 +126,7 @@ fun DetailsScreen(
     )
 }
 
-
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "LongParameterList")
 @Composable
 private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,

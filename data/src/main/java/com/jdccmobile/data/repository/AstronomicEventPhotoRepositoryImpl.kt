@@ -15,7 +15,9 @@ class AstronomicEventPhotoRepositoryImpl(
     override fun photosByEvent(eventId: AstronomicEventId): Flow<List<AstronomicEventPhoto>> =
         localDataSource.getPhotosByEvent(eventId)
 
-    override suspend fun insertPhoto(photo: AstronomicEventPhoto, file: File, imageToSave: ByteArray): Either<MyError, Unit> =
+    override suspend fun insertPhoto(
+        photo: AstronomicEventPhoto, file: File, imageToSave: ByteArray
+    ): Either<MyError, Unit> =
         localDataSource.insertPhoto(photo, file, imageToSave)
 
     override suspend fun deletePhoto(photo: AstronomicEventPhoto): Either<MyError, Unit> =

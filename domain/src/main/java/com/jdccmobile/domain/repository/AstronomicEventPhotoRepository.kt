@@ -10,7 +10,11 @@ import java.io.File
 interface AstronomicEventPhotoRepository {
     fun photosByEvent(eventId: AstronomicEventId): Flow<List<AstronomicEventPhoto>>
 
-    suspend fun insertPhoto(photo: AstronomicEventPhoto, file: File, imageToSave: ByteArray): Either<MyError, Unit>
+    suspend fun insertPhoto(
+        photo: AstronomicEventPhoto,
+        file: File,
+        imageToSave: ByteArray,
+    ): Either<MyError, Unit>
 
     suspend fun deletePhoto(photo: AstronomicEventPhoto): Either<MyError, Unit>
 }

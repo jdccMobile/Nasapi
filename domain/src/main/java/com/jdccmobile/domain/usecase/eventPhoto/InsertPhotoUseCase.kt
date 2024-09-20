@@ -9,6 +9,9 @@ import java.io.File
 class InsertPhotoUseCase(
     private val astronomicEventPhotoRepository: AstronomicEventPhotoRepository,
 ) {
-    suspend operator fun invoke(photo: AstronomicEventPhoto, file: File, imageToSave: ByteArray): Either<MyError, Unit>
-    = astronomicEventPhotoRepository.insertPhoto(photo, file, imageToSave)
+    suspend operator fun invoke(
+        photo: AstronomicEventPhoto,
+        file: File,
+        imageToSave: ByteArray,
+    ): Either<MyError, Unit> = astronomicEventPhotoRepository.insertPhoto(photo, file, imageToSave)
 }

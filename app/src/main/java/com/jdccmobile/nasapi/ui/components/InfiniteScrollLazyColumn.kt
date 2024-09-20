@@ -46,7 +46,14 @@ fun InfiniteScrollLazyColumn(
             item { CircularProgressBar(modifier = Modifier.padding(vertical = 16.dp)) }
         }
         if (errorLoadingData) {
-            item { error?.let { InfoError(errorMessage = it.message, errorIconId = R.drawable.ic_error) } }
+            item {
+                error?.let {
+                    InfoError(
+                        errorMessage = it.message,
+                        errorIconId = R.drawable.ic_error,
+                    )
+                }
+            }
         }
     }
 }

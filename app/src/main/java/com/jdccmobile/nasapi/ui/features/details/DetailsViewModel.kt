@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.usecase.eventPhoto.DeletePhotoUseCase
-import com.jdccmobile.domain.usecase.events.GetAstronomicEventUseCase
 import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
 import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventUseCase
 import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
@@ -77,11 +77,11 @@ class DetailsViewModel(
         }
     }
 
-    fun onCloseCamera(){
+    fun onCloseCamera() {
         _showCameraView.value = false
     }
 
-    fun onNavBack(){
+    fun onNavBack() {
         screenActions.onNavBack()
     }
 }

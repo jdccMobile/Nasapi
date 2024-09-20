@@ -41,7 +41,7 @@ fun FavoritesDestination(
     val viewModel: FavoritesViewModel = koinViewModel(
         parameters = {
             parametersOf(screenActions)
-        }
+        },
     )
     FavoritesScreen(viewModel = viewModel)
 }
@@ -60,7 +60,6 @@ fun FavoritesScreen(
         onBackNavigation = viewModel::onNavBack,
     )
 }
-
 
 @Composable
 private fun FavoritesContent(

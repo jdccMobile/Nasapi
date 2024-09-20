@@ -32,18 +32,18 @@ fun HomeDestination(
 ) {
     val screenActions = HomeScreenActions(
         navigateToFavorites = navigateToFavorites,
-        navigateToDetails = navigateToDetails
+        navigateToDetails = navigateToDetails,
     )
     val viewModel: HomeViewModel = koinViewModel(
         parameters = {
             parametersOf(screenActions)
-        }
+        },
     )
     HomeScreen(viewModel = viewModel)
 }
 
 @Composable
-private fun HomeScreen( viewModel: HomeViewModel){
+private fun HomeScreen(viewModel: HomeViewModel) {
     val astronomicalEvents by viewModel.astronomicEvents.collectAsStateWithLifecycle()
     val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
     val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
@@ -77,7 +77,7 @@ private fun HomeContent(
         title = stringResource(R.string.app_name),
         actions = {
             ActionIconButton(
-                icon = if(thereIsFavEvents) {
+                icon = if (thereIsFavEvents) {
                     Icons.Default.Favorite
                 } else {
                     Icons.Outlined.FavoriteBorder

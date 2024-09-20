@@ -79,7 +79,7 @@ fun AstronomicEventItem(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                 }
             }
