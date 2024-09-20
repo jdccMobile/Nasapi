@@ -25,29 +25,48 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun FavoritesScreen(
-    viewModel: FavoritesViewModel = koinViewModel(),
+fun FavoritesDestination(
     onNavBack: () -> Unit,
+    navigateToDetails: (String) -> Unit,
+) {
+    val screenActions = FavoritesScreenActions(
+        onNavBack = onNavBack,
+        onNavToDetails = navigateToDetails,
+    )
+    val viewModel: FavoritesViewModel = koinViewModel(
+        parameters = {
+            parametersOf(screenActions)
+        }
+    )
+    FavoritesScreen(viewModel = viewModel)
+}
+
+@Composable
+fun FavoritesScreen(
+    viewModel: FavoritesViewModel,
 ) {
     val favoriteEvents by viewModel.favoriteEvents.collectAsStateWithLifecycle()
     val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
+
     FavoritesContent(
         favoriteEvents = favoriteEvents.toImmutableList(),
         isDataLoading = isDataLoading,
         onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
-        onBackNavigation = onNavBack,
+        onBackNavigation = viewModel::onNavBack,
     )
 }
+
 
 @Composable
 private fun FavoritesContent(
     favoriteEvents: ImmutableList<AstronomicEventUi>,
     isDataLoading: Boolean,
-    onFavoriteEventClicked: () -> Unit,
+    onFavoriteEventClicked: (String) -> Unit,
     onBackNavigation: () -> Unit,
 ) {
     TopBarWithNavigationScaffold(
@@ -65,7 +84,7 @@ private fun FavoritesContent(
                     items(favoriteEvents) { event ->
                         AstronomicEventItem(
                             astronomicEventUi = event,
-                            onClick = { onFavoriteEventClicked() },
+                            onClick = { onFavoriteEventClicked(event.id.value) },
                         )
                     }
                 }

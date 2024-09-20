@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.jdccmobile.nasapi.ui.features.details.DetailsDestination
-import com.jdccmobile.nasapi.ui.features.favorites.FavoritesScreen
+import com.jdccmobile.nasapi.ui.features.favorites.FavoritesDestination
 import com.jdccmobile.nasapi.ui.features.home.HomeDestination
 
 @Composable
@@ -25,8 +25,11 @@ fun NavHost() {
             )
         }
         composable<FavoritesDestination> {
-            FavoritesScreen(
+            FavoritesDestination(
                 onNavBack = { navController.popBackStack() },
+                navigateToDetails = { astronomicEventId ->
+                    navController.navigate(DetailsDestination(astronomicEventId))
+                },
             )
         }
         composable<DetailsDestination> { backStackEntry ->

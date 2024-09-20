@@ -14,16 +14,17 @@ import com.jdccmobile.data.repository.RequestAndInsertEventsPerWeek
 import com.jdccmobile.domain.repository.AstronomicEventPhotoRepository
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.domain.usecase.eventPhoto.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
 import com.jdccmobile.domain.usecase.events.GetAstronomicEventUseCase
 import com.jdccmobile.domain.usecase.events.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.GetIfThereIsFavEventsUseCase
-import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
-import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
 import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.features.details.DetailsScreenActions
 import com.jdccmobile.nasapi.ui.features.details.DetailsViewModel
+import com.jdccmobile.nasapi.ui.features.favorites.FavoritesScreenActions
 import com.jdccmobile.nasapi.ui.features.favorites.FavoritesViewModel
 import com.jdccmobile.nasapi.ui.features.home.HomeScreenActions
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
@@ -31,7 +32,6 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.compose.viewmodel.dsl.viewModel
-import org.koin.compose.viewmodel.dsl.viewModelOf
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.core.module.dsl.factoryOf
@@ -58,7 +58,14 @@ private val appModule = module {
             getIfThereIsFavEventsUseCase = get(),
         )
     }
-    viewModelOf(::FavoritesViewModel)
+
+    viewModel { (screenActions: FavoritesScreenActions) ->
+        FavoritesViewModel(
+            screenActions = screenActions,
+            getFavoriteAstronomicEventsUseCase = get(),
+        )
+    }
+
     viewModel { (astronomicEventId: String, screenActions: DetailsScreenActions) ->
         DetailsViewModel(
             astronomicEventId = astronomicEventId,

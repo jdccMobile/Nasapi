@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FavoritesViewModel(
+    private val screenActions: FavoritesScreenActions,
     getFavoriteAstronomicEventsUseCase: GetFavoriteAstronomicEventsUseCase,
 ) : ViewModel() {
     private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -30,7 +31,16 @@ class FavoritesViewModel(
             .onStart { _isDataLoading.value = true }
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun onFavoriteEventClicked() {
-        // TODO navigate to details
+    fun onFavoriteEventClicked(astronomicEventId: String) {
+        screenActions.onNavToDetails(astronomicEventId)
+    }
+
+    fun onNavBack() {
+        screenActions.onNavBack()
     }
 }
+
+data class FavoritesScreenActions(
+    val onNavBack: () -> Unit,
+    val onNavToDetails: (String) -> Unit,
+)
