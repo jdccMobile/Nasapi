@@ -121,6 +121,7 @@ fun DetailsScreen(
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onSavePhotoTaken = viewModel::onSavePhotoTaken,
         onDeleteUserPhoto = viewModel::onDeletePhoto,
+        onCloseCamera = viewModel::onCloseCamera,
         onBackNavigation = viewModel::onNavBack,
     )
 }
@@ -137,6 +138,7 @@ private fun DetailsContent(
     onTakePhotoFabClicked: () -> Unit,
     onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
+    onCloseCamera: () -> Unit,
     onBackNavigation: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -158,9 +160,7 @@ private fun DetailsContent(
                 Camera(
                     eventId = astronomicEvent?.id ?: AstronomicEventId(""),
                     onSavePhotoTaken = onSavePhotoTaken,
-                    onCloseCamera = {
-                        // Todo add navigation
-                    },
+                    onCloseCamera = onCloseCamera,
                 )
             } else {
                 LazyColumn(
@@ -351,6 +351,7 @@ private fun HomeScreenDestinationPreview() {
             userPhotos = emptyList(),
             onSavePhotoTaken = { _, _, _ -> },
             onDeleteUserPhoto = {},
+            onCloseCamera = {},
             onBackNavigation = {},
         )
     }

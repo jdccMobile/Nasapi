@@ -77,6 +77,10 @@ class DetailsViewModel(
         }
     }
 
+    fun onCloseCamera(){
+        _showCameraView.value = false
+    }
+
     fun onNavBack(){
         screenActions.onNavBack()
     }
