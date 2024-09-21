@@ -3,11 +3,11 @@ package com.jdccmobile.nasapi.ui.features.details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.model.AstronomicEventId
-import com.jdccmobile.domain.repository.AstronomicEventRepository
-import com.jdccmobile.domain.usecase.DeletePhotoUseCase
-import com.jdccmobile.domain.usecase.GetPhotosByEventUseCase
-import com.jdccmobile.domain.usecase.InsertPhotoUseCase
-import com.jdccmobile.domain.usecase.SwitchEventFavoriteStatusUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.DeletePhotoUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.GetPhotosByEventUseCase
+import com.jdccmobile.domain.usecase.eventPhoto.InsertPhotoUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventUseCase
+import com.jdccmobile.domain.usecase.events.SwitchEventFavoriteStatusUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toDomain
@@ -21,13 +21,15 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModel(
-//    private val astronomicEventId: AstronomicEventId, // todo
-    private val repository: AstronomicEventRepository,
-    private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
+    astronomicEventId: String,
+    private val screenActions: DetailsScreenActions,
+    getAstronomicEventUseCase: GetAstronomicEventUseCase,
     getPhotosByEventUseCase: GetPhotosByEventUseCase,
+    private val switchEventFavoriteStatusUseCase: SwitchEventFavoriteStatusUseCase,
     private val insertPhotoUseCase: InsertPhotoUseCase,
     private val deletePhotoUseCase: DeletePhotoUseCase,
 ) : ViewModel() {
@@ -38,20 +40,19 @@ class DetailsViewModel(
     val showCameraView: StateFlow<Boolean> = _showCameraView.asStateFlow()
 
     val astronomicEvent: StateFlow<AstronomicEventUi?> =
-        repository.getAstronomicEventDetails(
-            AstronomicEventId("ae20240914"), // todo
-        ) // todo astronomicEventId
-            .mapLatest {
-                _isDataLoading.value = false
-                it.toUi()
-            }
+        getAstronomicEventUseCase(
+            AstronomicEventId(astronomicEventId),
+        ).mapLatest {
+            _isDataLoading.value = false
+            it.toUi()
+        }
             .onStart { _isDataLoading.value = true }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val userPhotos: StateFlow<List<AstronomicEventPhotoUi>> =
-        getPhotosByEventUseCase(AstronomicEventId("ae20240914")) // todo
+        getPhotosByEventUseCase(AstronomicEventId(astronomicEventId)) // todo
             .mapLatest { it.toUi() }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun onSwitchFavStatusClicked() {
         viewModelScope.launch {
@@ -63,9 +64,9 @@ class DetailsViewModel(
         _showCameraView.value = true
     }
 
-    fun onSavePhotoTaken(photo: AstronomicEventPhotoUi) {
+    fun onSavePhotoTaken(photo: AstronomicEventPhotoUi, file: File, imageToSave: ByteArray) {
         viewModelScope.launch {
-            insertPhotoUseCase(photo.toDomain())
+            insertPhotoUseCase(photo.toDomain(), file, imageToSave)
             _showCameraView.value = false
         }
     }
@@ -75,4 +76,16 @@ class DetailsViewModel(
             deletePhotoUseCase(photo.toDomain())
         }
     }
+
+    fun onCloseCamera() {
+        _showCameraView.value = false
+    }
+
+    fun onNavBack() {
+        screenActions.onNavBack()
+    }
 }
+
+data class DetailsScreenActions(
+    val onNavBack: () -> Unit,
+)

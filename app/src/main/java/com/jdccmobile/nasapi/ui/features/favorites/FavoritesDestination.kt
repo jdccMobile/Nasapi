@@ -6,15 +6,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
-import com.jdccmobile.nasapi.ui.components.CardItem
+import com.jdccmobile.nasapi.ui.components.AstronomicEventItem
 import com.jdccmobile.nasapi.ui.components.CircularProgressBar
 import com.jdccmobile.nasapi.ui.components.InfoError
 import com.jdccmobile.nasapi.ui.components.TopBarWithNavigationScaffold
@@ -25,17 +25,39 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun FavoritesScreen(viewModel: FavoritesViewModel = koinViewModel()) {
-    val favoriteEvents by viewModel.favoriteEvents.collectAsState()
-    val isDataLoading by viewModel.isDataLoading.collectAsState()
+fun FavoritesDestination(
+    onNavBack: () -> Unit,
+    navigateToDetails: (String) -> Unit,
+) {
+    val screenActions = FavoritesScreenActions(
+        onNavBack = onNavBack,
+        onNavToDetails = navigateToDetails,
+    )
+    val viewModel: FavoritesViewModel = koinViewModel(
+        parameters = {
+            parametersOf(screenActions)
+        },
+    )
+    FavoritesScreen(viewModel = viewModel)
+}
+
+@Composable
+fun FavoritesScreen(
+    viewModel: FavoritesViewModel,
+) {
+    val favoriteEvents by viewModel.favoriteEvents.collectAsStateWithLifecycle()
+    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
+
     FavoritesContent(
         favoriteEvents = favoriteEvents.toImmutableList(),
         isDataLoading = isDataLoading,
         onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
+        onBackNavigation = viewModel::onNavBack,
     )
 }
 
@@ -43,10 +65,12 @@ fun FavoritesScreen(viewModel: FavoritesViewModel = koinViewModel()) {
 private fun FavoritesContent(
     favoriteEvents: ImmutableList<AstronomicEventUi>,
     isDataLoading: Boolean,
-    onFavoriteEventClicked: () -> Unit,
+    onFavoriteEventClicked: (String) -> Unit,
+    onBackNavigation: () -> Unit,
 ) {
     TopBarWithNavigationScaffold(
         title = stringResource(R.string.favorites),
+        onBackNavigation = onBackNavigation,
     ) {
         if (!isDataLoading) {
             if (favoriteEvents.isNotEmpty()) {
@@ -57,9 +81,9 @@ private fun FavoritesContent(
                         .padding(Dimens.appPadding),
                 ) {
                     items(favoriteEvents) { event ->
-                        CardItem(
+                        AstronomicEventItem(
                             astronomicEventUi = event,
-                            onClick = { onFavoriteEventClicked() },
+                            onClick = { onFavoriteEventClicked(event.id.value) },
                         )
                     }
                 }
@@ -93,6 +117,7 @@ private fun HomeScreenDestinationPreview() {
             ).toImmutableList(),
             isDataLoading = false,
             onFavoriteEventClicked = {},
+            onBackNavigation = {},
         )
     }
 }

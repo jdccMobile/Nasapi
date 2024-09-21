@@ -1,4 +1,4 @@
-package com.jdccmobile.domain.usecase
+package com.jdccmobile.domain.usecase.events
 
 import arrow.core.Either
 import arrow.core.continuations.either

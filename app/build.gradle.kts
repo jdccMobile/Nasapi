@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 android {
@@ -64,6 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -75,6 +77,10 @@ dependencies {
 
     // Splash screen
     implementation(libs.androidx.splashscreen)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     // Koin
     implementation(libs.koin.core)

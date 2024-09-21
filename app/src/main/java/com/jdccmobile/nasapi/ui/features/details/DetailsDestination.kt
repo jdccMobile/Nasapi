@@ -35,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -49,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.components.Camera
@@ -62,15 +62,25 @@ import com.jdccmobile.nasapi.ui.theme.Dimens
 import com.jdccmobile.nasapi.ui.theme.NasapiTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import org.koin.core.parameter.parametersOf
+import java.io.File
 import java.time.LocalDate
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
-    val astronomicEvent by viewModel.astronomicEvent.collectAsState()
-    val isDataLoading by viewModel.isDataLoading.collectAsState()
-    val showCameraView by viewModel.showCameraView.collectAsState()
-    val userPhotos by viewModel.userPhotos.collectAsState()
+fun DetailsDestination(
+    astronomicEventId: String,
+    onNavBack: () -> Unit,
+) {
+    val screenActions = DetailsScreenActions(
+        onNavBack = onNavBack,
+    )
+
+    val viewModel: DetailsViewModel = koinViewModel(
+        parameters = {
+            parametersOf(astronomicEventId, screenActions)
+        },
+    )
 
     val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -88,6 +98,20 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         },
     )
 
+    DetailsScreen(viewModel = viewModel, permissionLauncher = permissionLauncher)
+}
+
+@Composable
+fun DetailsScreen(
+    viewModel: DetailsViewModel,
+    permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
+) {
+    val context = LocalContext.current
+    val astronomicEvent by viewModel.astronomicEvent.collectAsStateWithLifecycle()
+    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
+    val showCameraView by viewModel.showCameraView.collectAsStateWithLifecycle()
+    val userPhotos by viewModel.userPhotos.collectAsStateWithLifecycle()
+
     DetailsContent(
         astronomicEvent = astronomicEvent,
         isDataLoading = isDataLoading,
@@ -97,10 +121,12 @@ fun DetailsScreen(viewModel: DetailsViewModel = koinViewModel()) {
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onSavePhotoTaken = viewModel::onSavePhotoTaken,
         onDeleteUserPhoto = viewModel::onDeletePhoto,
+        onCloseCamera = viewModel::onCloseCamera,
+        onBackNavigation = viewModel::onNavBack,
     )
 }
 
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "LongParameterList")
 @Composable
 private fun DetailsContent(
     astronomicEvent: AstronomicEventUi?,
@@ -109,8 +135,10 @@ private fun DetailsContent(
     userPhotos: List<AstronomicEventPhotoUi>,
     onFavoriteFabClicked: () -> Unit,
     onTakePhotoFabClicked: () -> Unit,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onDeleteUserPhoto: (AstronomicEventPhotoUi) -> Unit,
+    onCloseCamera: () -> Unit,
+    onBackNavigation: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val showBackFab by remember { derivedStateOf { listState.firstVisibleItemScrollOffset == 0 } }
@@ -122,6 +150,7 @@ private fun DetailsContent(
         favoriteFabIcon = favoriteFabIcon,
         onFavoriteFabClicked = onFavoriteFabClicked,
         onTakePhotoFabClicked = onTakePhotoFabClicked,
+        onBackNavigation = onBackNavigation,
     ) {
         if (isDataLoading) {
             CircularProgressBar()
@@ -130,9 +159,7 @@ private fun DetailsContent(
                 Camera(
                     eventId = astronomicEvent?.id ?: AstronomicEventId(""),
                     onSavePhotoTaken = onSavePhotoTaken,
-                    onCloseCamera = {
-                        // Todo add navigation
-                    },
+                    onCloseCamera = onCloseCamera,
                 )
             } else {
                 LazyColumn(
@@ -142,7 +169,7 @@ private fun DetailsContent(
                 ) {
                     item {
                         ImageWithErrorIcon(
-                            imageUrl = "https://apod.nasa.gov/apod/image/2408/M20OriginalLRGBHaO3S2_1500x1100.jpg", // todo
+                            imageUrl = astronomicEvent?.imageUrl,
                             modifier = Modifier.height(400.dp),
                         )
                     }
@@ -219,7 +246,7 @@ fun MyPhotos(
                     MyPhotoCard(
                         photo = photo,
                         onDeleteUserPhoto = onDeleteUserPhoto,
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                     )
                 }
             }
@@ -321,8 +348,10 @@ private fun HomeScreenDestinationPreview() {
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},
             userPhotos = emptyList(),
-            onSavePhotoTaken = {},
+            onSavePhotoTaken = { _, _, _ -> },
             onDeleteUserPhoto = {},
+            onCloseCamera = {},
+            onBackNavigation = {},
         )
     }
 }

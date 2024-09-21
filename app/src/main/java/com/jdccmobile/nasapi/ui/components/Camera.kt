@@ -19,12 +19,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +35,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -45,15 +42,14 @@ import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.domain.model.AstronomicEventPhotoId
 import com.jdccmobile.nasapi.R
 import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
-import com.jdccmobile.nasapi.ui.theme.Dimens
+import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 
 @Composable
 fun Camera(
     eventId: AstronomicEventId,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onCloseCamera: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -119,7 +115,7 @@ private fun CameraView(
 private fun PhotoPreview(
     eventId: AstronomicEventId,
     previewPhoto: Bitmap,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onRemakePhoto: () -> Unit,
     context: Context,
     modifier: Modifier = Modifier,
@@ -156,16 +152,11 @@ private fun BoxScope.MainButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
-        IconButton(
-            onClick = { onCloseCamera() },
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.minTouchSize),
-            )
-        }
-        IconButton(
+        CameraButton(
+            onClick = onCloseCamera,
+            icon = IconResourceType.ImageVector(Icons.AutoMirrored.Filled.ArrowBack),
+        )
+        CameraButton(
             onClick = {
                 takePhoto(
                     onPhotoTaken = { onShowPreview(it) },
@@ -173,14 +164,9 @@ private fun BoxScope.MainButtons(
                     context = context,
                 )
             },
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_photo_camera),
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.minTouchSize),
-            )
-        }
-        IconButton(
+            icon = IconResourceType.Drawable(R.drawable.ic_photo_camera),
+        )
+        CameraButton(
             onClick = {
                 controller.cameraSelector =
                     if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
@@ -189,13 +175,8 @@ private fun BoxScope.MainButtons(
                         CameraSelector.DEFAULT_BACK_CAMERA
                     }
             },
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_camera_switch),
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.minTouchSize),
-            )
-        }
+            icon = IconResourceType.Drawable(R.drawable.ic_camera_switch),
+        )
     }
 }
 
@@ -203,7 +184,7 @@ private fun BoxScope.MainButtons(
 private fun BoxScope.PreviewButtons(
     eventId: String,
     previewPhoto: Bitmap,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     onRemakePhoto: () -> Unit,
     context: Context,
     modifier: Modifier = Modifier,
@@ -215,31 +196,33 @@ private fun BoxScope.PreviewButtons(
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
-        IconButton(
-            onClick = { onRemakePhoto() },
-        ) {
-            Icon(
-                imageVector = Icons.Default.Clear,
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.minTouchSize),
-            )
-        }
-        IconButton(
+        CameraButton(
+            onClick = onRemakePhoto,
+            icon = IconResourceType.ImageVector(Icons.Default.Clear),
+        )
+        CameraButton(
             onClick = {
-                savePhotoLocally(
+                getDataToSavePhotoLocally(
                     eventId,
                     previewPhoto,
                     onSavePhotoTaken,
                     context,
                 )
             },
-        ) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.minTouchSize),
-            )
-        }
+            icon = IconResourceType.ImageVector(Icons.Default.Check),
+        )
+    }
+}
+
+@Composable
+private fun CameraButton(
+    onClick: () -> Unit,
+    icon: IconResourceType,
+) {
+    IconButton(
+        onClick = onClick,
+    ) {
+        IconResourceTypeContent(icon)
     }
 }
 
@@ -277,22 +260,26 @@ private fun takePhoto(
 }
 
 @Suppress("MagicNumber")
-private fun savePhotoLocally(
+private fun getDataToSavePhotoLocally(
     eventId: String,
     previewImage: Bitmap,
-    onSavePhotoTaken: (AstronomicEventPhotoUi) -> Unit,
+    onSavePhotoTaken: (AstronomicEventPhotoUi, File, ByteArray) -> Unit,
     context: Context,
 ) {
     val fileName = "photo_${System.currentTimeMillis()}.jpg"
     val file = File(context.filesDir, fileName)
-    FileOutputStream(file).use { out ->
-        previewImage.compress(Bitmap.CompressFormat.JPEG, 100, out)
-    }
+
+    val stream = ByteArrayOutputStream()
+    previewImage.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+    val imageData = stream.toByteArray()
+
     onSavePhotoTaken(
         AstronomicEventPhotoUi(
             photoId = AstronomicEventPhotoId(UUID.randomUUID().toString()),
             eventId = AstronomicEventId(eventId),
             filePath = file.absolutePath,
         ),
+        file,
+        imageData,
     )
 }

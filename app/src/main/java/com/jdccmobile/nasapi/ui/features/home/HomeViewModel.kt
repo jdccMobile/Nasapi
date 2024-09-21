@@ -2,8 +2,9 @@ package com.jdccmobile.nasapi.ui.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jdccmobile.domain.usecase.GetAstronomicEventsUseCase
-import com.jdccmobile.domain.usecase.RequestAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetAstronomicEventsUseCase
+import com.jdccmobile.domain.usecase.events.GetIfThereIsFavEventsUseCase
+import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
 import com.jdccmobile.nasapi.ui.utils.getFirstDayOfWeek
@@ -20,15 +21,19 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@Suppress("ktlint:standard:property-naming") // TODO mirar como esta en la feina
 class HomeViewModel(
+    private val screenActions: HomeScreenActions,
     private val requestAstronomicEventsUseCase: RequestAstronomicEventsUseCase,
     getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
+    getIfThereIsFavEventsUseCase: GetIfThereIsFavEventsUseCase,
 ) : ViewModel() {
     val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
         getAstronomicEventsUseCase().mapLatest { events ->
             events.toUi().toSet()
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
+
+    val thereIsFavEvents: StateFlow<Boolean> = getIfThereIsFavEventsUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isInitialDataLoading: StateFlow<Boolean> = _isInitialDataLoading.asStateFlow()
@@ -36,8 +41,8 @@ class HomeViewModel(
     private val _isMoreDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isMoreDataLoading: StateFlow<Boolean> = _isMoreDataLoading.asStateFlow()
 
-    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    private val _error: MutableStateFlow<ErrorUi?> = MutableStateFlow(null)
+    val error: StateFlow<ErrorUi?> = _error.asStateFlow()
 
     fun onLoadMoreItems() {
         if (!_isMoreDataLoading.value) {
@@ -47,6 +52,7 @@ class HomeViewModel(
                     requestAstronomicEvents(
                         startDate = nextWeekToLoad.getFirstDayOfWeek(),
                         endDate = nextWeekToLoad.getLastDayOfWeek(),
+                        LoadingType.LoadingMoreData,
                     )
                 }
                 _isMoreDataLoading.value = false
@@ -54,12 +60,12 @@ class HomeViewModel(
         }
     }
 
-    fun onAstronomicEventClicked() {
-        // TODO navigate to details
+    fun onAstronomicEventClicked(astronomicEventId: String) {
+        screenActions.navigateToDetails(astronomicEventId)
     }
 
     fun onFavoritesClicked() {
-        // TODO navigate to favorites
+        screenActions.navigateToFavorites()
     }
 
     init {
@@ -74,6 +80,7 @@ class HomeViewModel(
             requestAstronomicEvents(
                 startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
+                loadingType = LoadingType.InitialLoading,
             )
             _isInitialDataLoading.value = false
         }
@@ -83,15 +90,34 @@ class HomeViewModel(
     private suspend fun requestAstronomicEvents(
         startDate: LocalDate,
         endDate: LocalDate,
+        loadingType: LoadingType,
     ) {
         requestAstronomicEventsUseCase(
             startDate = startDate.toString(),
             endDate = endDate.toString(),
         ).fold(
             ifLeft = { error ->
-                _errorMessage.value = error.toMessage()
+                _error.value = ErrorUi(error.toMessage(), loadingType)
             },
-            ifRight = { nextWeekToLoad = startDate.minusWeeks(1) },
+            ifRight = {
+                nextWeekToLoad = startDate.minusWeeks(1)
+                _error.value = null
+            },
         )
     }
+}
+
+data class HomeScreenActions(
+    val navigateToFavorites: () -> Unit,
+    val navigateToDetails: (String) -> Unit,
+)
+
+data class ErrorUi(
+    val message: String,
+    val type: LoadingType,
+)
+
+enum class LoadingType {
+    InitialLoading,
+    LoadingMoreData,
 }
