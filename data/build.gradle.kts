@@ -25,4 +25,8 @@ dependencies {
     implementation(libs.room.common)
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
+    // Tests
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.inline)
 }
