@@ -120,6 +120,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.inline)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 ktlint {
