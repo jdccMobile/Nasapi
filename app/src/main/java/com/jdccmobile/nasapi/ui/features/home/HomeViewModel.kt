@@ -12,11 +12,9 @@ import com.jdccmobile.nasapi.ui.utils.getLastDayOfWeek
 import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -27,35 +25,44 @@ class HomeViewModel(
     getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
     getIfThereIsFavEventsUseCase: GetIfThereIsFavEventsUseCase,
 ) : ViewModel() {
-    val astronomicEvents: StateFlow<Set<AstronomicEventUi>> =
-        getAstronomicEventsUseCase().mapLatest { events ->
-            events.toUi().toSet()
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
-    val thereIsFavEvents: StateFlow<Boolean> = getIfThereIsFavEventsUseCase()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    private val _uiState = MutableStateFlow(
+        UiState(
+            isInitialDataLoading = true,
+            isMoreDataLoading = false,
+            astronomicEvents = emptySet(),
+            thereIsFavEvents = false,
+            error = null,
+        ),
+    )
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val _isInitialDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isInitialDataLoading: StateFlow<Boolean> = _isInitialDataLoading.asStateFlow()
-
-    private val _isMoreDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isMoreDataLoading: StateFlow<Boolean> = _isMoreDataLoading.asStateFlow()
-
-    private val _error: MutableStateFlow<ErrorUi?> = MutableStateFlow(null)
-    val error: StateFlow<ErrorUi?> = _error.asStateFlow()
+    init {
+        requestInitialEvents()
+        viewModelScope.launch {
+            getAstronomicEventsUseCase().collect { events ->
+                _uiState.update { it.copy(astronomicEvents = events.toUi().toSet()) }
+            }
+        }
+        viewModelScope.launch {
+            getIfThereIsFavEventsUseCase().collect { thereIsFavEvents ->
+                _uiState.update { it.copy(thereIsFavEvents = thereIsFavEvents) }
+            }
+        }
+    }
 
     fun onLoadMoreItems() {
-        if (!_isMoreDataLoading.value) {
+        if (!_uiState.value.isMoreDataLoading) {
+            _uiState.update { it.copy(isMoreDataLoading = true) }
             viewModelScope.launch {
-                _isMoreDataLoading.value = true
                 nextWeekToLoad?.let { nextWeekToLoad ->
                     requestAstronomicEvents(
                         startDate = nextWeekToLoad.getFirstDayOfWeek(),
                         endDate = nextWeekToLoad.getLastDayOfWeek(),
-                        LoadingType.LoadingMoreData,
+                        loadingType = LoadingType.LoadingMoreData,
                     )
                 }
-                _isMoreDataLoading.value = false
+                _uiState.update { it.copy(isMoreDataLoading = false) }
             }
         }
     }
@@ -68,21 +75,16 @@ class HomeViewModel(
         screenActions.navigateToFavorites()
     }
 
-    init {
-        requestInitialEvents()
-    }
-
     private var nextWeekToLoad: LocalDate? = null
 
-    private fun requestInitialEvents() {
+    fun requestInitialEvents() {
         viewModelScope.launch {
-            _isInitialDataLoading.value = true
             requestAstronomicEvents(
                 startDate = LocalDate.now().getFirstDayOfWeek(),
                 endDate = LocalDate.now(),
                 loadingType = LoadingType.InitialLoading,
             )
-            _isInitialDataLoading.value = false
+            _uiState.update { it.copy(isInitialDataLoading = false) }
         }
     }
 
@@ -97,15 +99,24 @@ class HomeViewModel(
             endDate = endDate.toString(),
         ).fold(
             ifLeft = { error ->
-                _error.value = ErrorUi(error.toMessage(), loadingType)
+                _uiState.update { it.copy(error = ErrorUi(error.toMessage(), loadingType)) }
+
             },
             ifRight = {
                 nextWeekToLoad = startDate.minusWeeks(1)
-                _error.value = null
+                _uiState.update { it.copy(error = null) }
             },
         )
     }
 }
+
+data class UiState(
+    val isInitialDataLoading: Boolean,
+    val isMoreDataLoading: Boolean,
+    val astronomicEvents: Set<AstronomicEventUi>,
+    val thereIsFavEvents: Boolean,
+    val error: ErrorUi?,
+)
 
 data class HomeScreenActions(
     val navigateToFavorites: () -> Unit,

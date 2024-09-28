@@ -2,43 +2,39 @@ import app.cash.turbine.test
 import arrow.core.Either
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
+import com.jdccmobile.domain.model.MyError
 import com.jdccmobile.domain.usecase.events.GetAstronomicEventsUseCase
 import com.jdccmobile.domain.usecase.events.GetIfThereIsFavEventsUseCase
 import com.jdccmobile.domain.usecase.events.RequestAstronomicEventsUseCase
+import com.jdccmobile.nasapi.ui.features.home.ErrorUi
 import com.jdccmobile.nasapi.ui.features.home.HomeScreenActions
 import com.jdccmobile.nasapi.ui.features.home.HomeViewModel
+import com.jdccmobile.nasapi.ui.features.home.LoadingType
+import com.jdccmobile.nasapi.ui.features.home.UiState
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.utils.toMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.anyString
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class HomeViewModelTest {
-
-    private val testDispatcher = StandardTestDispatcher()
-
-    @Mock
-    lateinit var screenActions: HomeScreenActions
 
     @Mock
     lateinit var requestAstronomicEventsUseCase: RequestAstronomicEventsUseCase
@@ -49,41 +45,60 @@ class HomeViewModelTest {
     @Mock
     lateinit var getIfThereIsFavEventsUseCase: GetIfThereIsFavEventsUseCase
 
-    private lateinit var vm: HomeViewModel
+    @Mock
+    lateinit var screenActions: HomeScreenActions
 
-    private val eventsMock = List(5) {
+    private lateinit var viewModel: HomeViewModel
+
+    private val testDispatcher = StandardTestDispatcher()
+
+    private val astronomicEvents = listOf(
         AstronomicEvent(
-            id = AstronomicEventId(it.toString()),
-            title = "Prueba $it",
-            description = "Description $it",
+            id = AstronomicEventId("1"),
+            title = "Prueba",
+            description = "Descripcion",
             date = LocalDate.now(),
             imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
             isFavorite = false,
             hasImage = false,
-        )
-    }
-
-    private val eventsUiMock = List(5) {
-        AstronomicEventUi(
-            id = AstronomicEventId(it.toString()),
-            title = "Prueba $it",
-            description = "Description $it",
-            date = LocalDate.now().plusWeeks(it.toLong()),
+        ),
+        AstronomicEvent(
+            id = AstronomicEventId("2"),
+            title = "Prueba",
+            description = "Descripcion",
+            date = LocalDate.now(),
             imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
             isFavorite = false,
             hasImage = false,
-        )
-    }
+        ),
+    )
+
+    private val astronomicEventsUi = listOf(
+        AstronomicEventUi(
+            id = AstronomicEventId("1"),
+            title = "Prueba",
+            description = "Descripcion",
+            date = LocalDate.now(),
+            imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
+            isFavorite = false,
+            hasImage = false,
+        ),
+        AstronomicEventUi(
+            id = AstronomicEventId("2"),
+            title = "Prueba",
+            description = "Descripcion",
+            date = LocalDate.now(),
+            imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
+            isFavorite = false,
+            hasImage = false,
+        ),
+    )
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        vm = HomeViewModel(
-            screenActions,
-            requestAstronomicEventsUseCase,
-            getAstronomicEventsUseCase,
-            getIfThereIsFavEventsUseCase,
-        )
+        whenever(getAstronomicEventsUseCase()).thenReturn(flowOf(astronomicEvents))
+        whenever(getIfThereIsFavEventsUseCase()).thenReturn(flowOf(true))
     }
 
     @After
@@ -92,36 +107,113 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `Initial data is loaded correctly`() = runTest {
-        Dispatchers.setMain(testDispatcher)
-
-
-        // Mockear que el flujo emite los eventos
-        whenever(getAstronomicEventsUseCase()).thenReturn(flow {
-            emitAll(flowOf(eventsMock)) // Asegúrate de que emita todos los eventos
-        })
-        runCurrent()
-        whenever(requestAstronomicEventsUseCase(anyString(), anyString())).thenReturn(Either.Right(Unit))
-
-        withTimeout(2000) {
-            vm.isInitialDataLoading.test {
-                assert(awaitItem()) // true en la primera emisión
-                vm.onLoadMoreItems()
-                advanceUntilIdle()
-                assert(!awaitItem()) // false en la segunda emisión
-            }
-
-            vm.astronomicEvents.test {
-                assert(awaitItem().isEmpty()) // Debería estar vacío
-                vm.onLoadMoreItems()
-                advanceUntilIdle()
-                val loadedEvents = awaitItem()
-                assertEquals(eventsUiMock.toSet(), loadedEvents)
-            }
+    fun `Initial state is loading and events are loaded successfully`() = runTest {
+        whenever(requestAstronomicEventsUseCase(any(), any())).thenReturn(Either.Right(Unit))
+        viewModel = HomeViewModel(
+            screenActions,
+            requestAstronomicEventsUseCase,
+            getAstronomicEventsUseCase,
+            getIfThereIsFavEventsUseCase,
+        )
+        viewModel.uiState.test {
+            assertEquals(
+                UiState(
+                    isInitialDataLoading = true,
+                    isMoreDataLoading = false,
+                    astronomicEvents = emptySet(),
+                    thereIsFavEvents = false,
+                    error = null,
+                ),
+                awaitItem(),
+            )
         }
+        runCurrent()
+        viewModel.uiState.test {
+            assertEquals(
+                UiState(
+                    isInitialDataLoading = false,
+                    isMoreDataLoading = false,
+                    astronomicEvents = astronomicEventsUi.toSet(),
+                    thereIsFavEvents = true,
+                    error = null,
+                ),
+                awaitItem(),
+            )
 
-        Dispatchers.resetMain()
+            cancel()
+        }
     }
 
+    @Test
+    fun `Load more items updates the UI correctly`() = runTest {
+        whenever(requestAstronomicEventsUseCase(any(), any())).thenReturn(Either.Right(Unit))
+        viewModel = HomeViewModel(
+            screenActions,
+            requestAstronomicEventsUseCase,
+            getAstronomicEventsUseCase,
+            getIfThereIsFavEventsUseCase,
+        )
+        viewModel.requestInitialEvents()
+        runCurrent()
+        viewModel.onLoadMoreItems()
 
+        viewModel.uiState.test {
+            assertEquals(
+                UiState(
+                    isInitialDataLoading = false,
+                    isMoreDataLoading = true,
+                    astronomicEvents = astronomicEventsUi.toSet(),
+                    thereIsFavEvents = true,
+                    error = null,
+                ),
+                awaitItem(),
+            )
+
+            assertEquals(
+                UiState(
+                    isInitialDataLoading = false,
+                    isMoreDataLoading = false,
+                    astronomicEvents = astronomicEventsUi.toSet(),
+                    thereIsFavEvents = true,
+                    error = null,
+                ),
+                awaitItem(),
+            )
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `Shows error when request for init events fails`() = runTest {
+        whenever(
+            requestAstronomicEventsUseCase(
+                any(),
+                any(),
+            ),
+        ).thenReturn(Either.Left(MyError.Connectivity))
+        viewModel = HomeViewModel(
+            screenActions,
+            requestAstronomicEventsUseCase,
+            getAstronomicEventsUseCase,
+            getIfThereIsFavEventsUseCase,
+        )
+
+        viewModel.requestInitialEvents()
+        runCurrent()
+
+        viewModel.uiState.test {
+            assertEquals(
+                UiState(
+                    isInitialDataLoading = false,
+                    isMoreDataLoading = false,
+                    astronomicEvents = astronomicEventsUi.toSet(),
+                    thereIsFavEvents = true,
+                    error = ErrorUi(MyError.Connectivity.toMessage(), LoadingType.InitialLoading),
+                ),
+                awaitItem(),
+            )
+            cancel()
+        }
+    }
 }

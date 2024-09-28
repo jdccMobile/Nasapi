@@ -44,18 +44,18 @@ fun HomeDestination(
 
 @Composable
 private fun HomeScreen(viewModel: HomeViewModel) {
-    val astronomicalEvents by viewModel.astronomicEvents.collectAsStateWithLifecycle()
-    val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
-    val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
-    val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsStateWithLifecycle()
-    val error by viewModel.error.collectAsStateWithLifecycle()
+//    val astronomicalEvents by viewModel.astronomicEvents.collectAsStateWithLifecycle()
+//    val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
+//    val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
+//    val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeContent(
-        astronomicEvents = astronomicalEvents.toImmutableList(),
-        thereIsFavEvents = thereIsFavEvents,
-        isInitialDataLoading = isInitialDataLoading,
-        isMoreDataLoading = isMoreDataLoading,
-        error = error,
+        astronomicEvents = uiState.astronomicEvents.toImmutableList(),
+        thereIsFavEvents = uiState.thereIsFavEvents,
+        isInitialDataLoading = uiState.isInitialDataLoading,
+        isMoreDataLoading = uiState.isMoreDataLoading,
+        error = uiState.error,
         onLoadMoreItems = viewModel::onLoadMoreItems,
         navigateToDetails = viewModel::onAstronomicEventClicked,
         navigateToFavorites = viewModel::onFavoritesClicked,
