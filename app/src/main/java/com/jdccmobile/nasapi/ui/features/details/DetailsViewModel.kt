@@ -40,12 +40,12 @@ class DetailsViewModel(
 
     init {
         viewModelScope.launch {
-            getAstronomicEventUseCase(AstronomicEventId(astronomicEventId)).collect{ event ->
+            getAstronomicEventUseCase(AstronomicEventId(astronomicEventId)).collect { event ->
                 _uiState.update { it.copy(isLoading = false, astronomicEvent = event.toUi()) }
             }
         }
         viewModelScope.launch {
-            getPhotosByEventUseCase(AstronomicEventId(astronomicEventId)).collect{ photos ->
+            getPhotosByEventUseCase(AstronomicEventId(astronomicEventId)).collect { photos ->
                 _uiState.update { it.copy(isLoading = false, userPhotos = photos.toUi()) }
             }
         }

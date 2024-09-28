@@ -35,7 +35,6 @@ import java.time.LocalDate
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class DetailsViewModelTest {
-
     @Mock
     lateinit var getAstronomicEventUseCase: GetAstronomicEventUseCase
 
@@ -78,7 +77,7 @@ class DetailsViewModelTest {
         AstronomicEventPhotoUi(
             photoId = AstronomicEventPhotoId(it.toString()),
             eventId = AstronomicEventId(it.toString()),
-            filePath = "path ${it}",
+            filePath = "path $it",
         )
     }
 
@@ -87,10 +86,12 @@ class DetailsViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        whenever(getAstronomicEventUseCase(any())).thenReturn(flowOf(astronomicEventUiMock.toDomain()))
-        whenever(getPhotosByEventUseCase(any())).thenReturn(flowOf(userPhotosUiMock.map { it.toDomain() }))
-
-
+        whenever(
+            getAstronomicEventUseCase(any()),
+        ).thenReturn(flowOf(astronomicEventUiMock.toDomain()))
+        whenever(
+            getPhotosByEventUseCase(any()),
+        ).thenReturn(flowOf(userPhotosUiMock.map { it.toDomain() }))
     }
 
     @After

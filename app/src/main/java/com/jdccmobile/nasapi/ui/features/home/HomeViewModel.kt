@@ -25,7 +25,6 @@ class HomeViewModel(
     getAstronomicEventsUseCase: GetAstronomicEventsUseCase,
     getIfThereIsFavEventsUseCase: GetIfThereIsFavEventsUseCase,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(
         UiState(
             isInitialDataLoading = true,
@@ -100,7 +99,6 @@ class HomeViewModel(
         ).fold(
             ifLeft = { error ->
                 _uiState.update { it.copy(error = ErrorUi(error.toMessage(), loadingType)) }
-
             },
             ifRight = {
                 nextWeekToLoad = startDate.minusWeeks(1)

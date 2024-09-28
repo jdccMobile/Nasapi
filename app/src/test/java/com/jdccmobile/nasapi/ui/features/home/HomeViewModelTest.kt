@@ -35,7 +35,6 @@ import java.time.LocalDate
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class HomeViewModelTest {
-
     @Mock
     lateinit var requestAstronomicEventsUseCase: RequestAstronomicEventsUseCase
 

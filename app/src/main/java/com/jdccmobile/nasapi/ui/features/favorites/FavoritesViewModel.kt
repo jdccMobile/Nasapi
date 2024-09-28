@@ -15,7 +15,6 @@ class FavoritesViewModel(
     private val screenActions: FavoritesScreenActions,
     getFavoriteAstronomicEventsUseCase: GetFavoriteAstronomicEventsUseCase,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(
         UiState(
             loading = true,

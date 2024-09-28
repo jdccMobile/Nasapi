@@ -25,7 +25,6 @@ import java.time.LocalDate
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class FavoritesViewModelTest {
-
     @Mock
     lateinit var getFavoriteAstronomicEventsUseCase: GetFavoriteAstronomicEventsUseCase
 
@@ -112,4 +111,3 @@ class FavoritesViewModelTest {
         }
     }
 }
-
