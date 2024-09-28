@@ -32,6 +32,7 @@ kotlinxSerialization = "1.6.3"
 lifecycleRuntimeCompose = "2.8.5"
 mockitoKotlinVersion = "4.0.0"
 mockitoInlineVersion = "4.4.0"
+turbineVersion = "0.7.0"
 
 
 
@@ -94,6 +95,9 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 # Mockito
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlinVersion" }
 mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockitoInlineVersion" }
+
+# Turbine
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbineVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

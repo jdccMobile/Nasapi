@@ -50,12 +50,12 @@ fun FavoritesDestination(
 fun FavoritesScreen(
     viewModel: FavoritesViewModel,
 ) {
-    val favoriteEvents by viewModel.favoriteEvents.collectAsStateWithLifecycle()
-    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+//    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
 
     FavoritesContent(
-        favoriteEvents = favoriteEvents.toImmutableList(),
-        isDataLoading = isDataLoading,
+        favoriteEvents = uiState.favoriteEvents.toImmutableList(),
+        isDataLoading = uiState.loading,
         onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
         onBackNavigation = viewModel::onNavBack,
     )

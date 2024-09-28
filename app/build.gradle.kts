@@ -121,6 +121,7 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 }
 
 ktlint {
