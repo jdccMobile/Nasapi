@@ -12,18 +12,13 @@ import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toDomain
 import com.jdccmobile.nasapi.ui.model.toUi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModel(
     astronomicEventId: String,
     private val screenActions: DetailsScreenActions,
@@ -33,41 +28,43 @@ class DetailsViewModel(
     private val insertPhotoUseCase: InsertPhotoUseCase,
     private val deletePhotoUseCase: DeletePhotoUseCase,
 ) : ViewModel() {
-    private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
+    private val _uiState = MutableStateFlow(
+        UiState(
+            isLoading = true,
+            showCameraView = false,
+            astronomicEvent = null,
+            userPhotos = emptyList(),
+        ),
+    )
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val _showCameraView: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val showCameraView: StateFlow<Boolean> = _showCameraView.asStateFlow()
-
-    val astronomicEvent: StateFlow<AstronomicEventUi?> =
-        getAstronomicEventUseCase(
-            AstronomicEventId(astronomicEventId),
-        ).mapLatest {
-            _isDataLoading.value = false
-            it.toUi()
+    init {
+        viewModelScope.launch {
+            getAstronomicEventUseCase(AstronomicEventId(astronomicEventId)).collect{ event ->
+                _uiState.update { it.copy(isLoading = false, astronomicEvent = event.toUi()) }
+            }
         }
-            .onStart { _isDataLoading.value = true }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    val userPhotos: StateFlow<List<AstronomicEventPhotoUi>> =
-        getPhotosByEventUseCase(AstronomicEventId(astronomicEventId)) // todo
-            .mapLatest { it.toUi() }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        viewModelScope.launch {
+            getPhotosByEventUseCase(AstronomicEventId(astronomicEventId)).collect{ photos ->
+                _uiState.update { it.copy(isLoading = false, userPhotos = photos.toUi()) }
+            }
+        }
+    }
 
     fun onSwitchFavStatusClicked() {
         viewModelScope.launch {
-            astronomicEvent.value?.let { switchEventFavoriteStatusUseCase(it.toDomain()) }
+            _uiState.value.astronomicEvent?.let { switchEventFavoriteStatusUseCase(it.toDomain()) }
         }
     }
 
     fun onOpenCameraClicked() {
-        _showCameraView.value = true
+        _uiState.update { it.copy(showCameraView = true) }
     }
 
     fun onSavePhotoTaken(photo: AstronomicEventPhotoUi, file: File, imageToSave: ByteArray) {
         viewModelScope.launch {
             insertPhotoUseCase(photo.toDomain(), file, imageToSave)
-            _showCameraView.value = false
+            _uiState.update { it.copy(showCameraView = false) }
         }
     }
 
@@ -78,13 +75,20 @@ class DetailsViewModel(
     }
 
     fun onCloseCamera() {
-        _showCameraView.value = false
+        _uiState.update { it.copy(showCameraView = false) }
     }
 
     fun onNavBack() {
         screenActions.onNavBack()
     }
 }
+
+data class UiState(
+    val isLoading: Boolean,
+    val showCameraView: Boolean,
+    val astronomicEvent: AstronomicEventUi?,
+    val userPhotos: List<AstronomicEventPhotoUi>,
+)
 
 data class DetailsScreenActions(
     val onNavBack: () -> Unit,

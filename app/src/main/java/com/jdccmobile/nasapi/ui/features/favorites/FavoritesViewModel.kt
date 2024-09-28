@@ -24,20 +24,20 @@ class FavoritesViewModel(
     )
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    fun onFavoriteEventClicked(astronomicEventId: String) {
-        screenActions.onNavToDetails(astronomicEventId)
-    }
-
-    fun onNavBack() {
-        screenActions.onNavBack()
-    }
-
     init {
         viewModelScope.launch {
             getFavoriteAstronomicEventsUseCase().collect { events ->
                 _uiState.update { UiState(loading = false, favoriteEvents = events.toUi()) }
             }
         }
+    }
+
+    fun onFavoriteEventClicked(astronomicEventId: String) {
+        screenActions.onNavToDetails(astronomicEventId)
+    }
+
+    fun onNavBack() {
+        screenActions.onNavBack()
     }
 }
 
