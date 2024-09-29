@@ -46,7 +46,7 @@ fun HomeDestination(
 private fun HomeScreen(viewModel: HomeViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    HomeContent(
+    HomeScreen(
         astronomicEvents = uiState.astronomicEvents.toImmutableList(),
         thereIsFavEvents = uiState.thereIsFavEvents,
         isInitialDataLoading = uiState.isInitialDataLoading,
@@ -59,7 +59,7 @@ private fun HomeScreen(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun HomeContent(
+fun HomeScreen(
     astronomicEvents: ImmutableList<AstronomicEventUi>,
     thereIsFavEvents: Boolean,
     isInitialDataLoading: Boolean,
@@ -106,7 +106,7 @@ fun HomeContent(
 @Composable
 private fun HomeScreenDestinationPreview() {
     NasapiTheme {
-        HomeContent(
+        HomeScreen(
             astronomicEvents = listOf(
                 AstronomicEventUi(
                     id = AstronomicEventId("1"),

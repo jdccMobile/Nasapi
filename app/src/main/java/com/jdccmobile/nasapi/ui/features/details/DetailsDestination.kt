@@ -109,7 +109,7 @@ fun DetailsScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    DetailsContent(
+    DetailsScreen(
         astronomicEvent = uiState.astronomicEvent,
         isLoading = uiState.isLoading,
         showCameraView = uiState.showCameraView,
@@ -125,7 +125,7 @@ fun DetailsScreen(
 
 @Suppress("MagicNumber", "LongParameterList")
 @Composable
-private fun DetailsContent(
+fun DetailsScreen(
     astronomicEvent: AstronomicEventUi?,
     isLoading: Boolean,
     showCameraView: Boolean,
@@ -330,7 +330,7 @@ private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
 @Composable
 private fun HomeScreenDestinationPreview() {
     NasapiTheme {
-        DetailsContent(
+        DetailsScreen(
             astronomicEvent = AstronomicEventUi(
                 id = AstronomicEventId("1"),
                 title = "Prueba",

@@ -8,7 +8,7 @@ import androidx.compose.ui.test.performClick
 import com.jdccmobile.domain.model.AstronomicEventId
 import com.jdccmobile.nasapi.ui.components.LOADING_INDICATOR_TAG
 import com.jdccmobile.nasapi.ui.features.home.ErrorUi
-import com.jdccmobile.nasapi.ui.features.home.HomeContent
+import com.jdccmobile.nasapi.ui.features.home.HomeScreen
 import com.jdccmobile.nasapi.ui.features.home.LoadingType
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import kotlinx.collections.immutable.toImmutableList
@@ -37,7 +37,7 @@ class HomeScreenTest {
     @Test
     fun `When loading state show progress`(): Unit = with(composeTestRule) {
         setContent {
-            HomeContent(
+            HomeScreen(
                 astronomicEvents = emptyList<AstronomicEventUi>().toImmutableList(),
                 thereIsFavEvents = false,
                 isInitialDataLoading = true,
@@ -55,7 +55,7 @@ class HomeScreenTest {
     @Test
     fun `When error state show error message`(): Unit = with(composeTestRule) {
         setContent {
-            HomeContent(
+            HomeScreen(
                 astronomicEvents = emptyList<AstronomicEventUi>().toImmutableList(),
                 thereIsFavEvents = false,
                 isInitialDataLoading = false,
@@ -72,7 +72,7 @@ class HomeScreenTest {
     @Test
     fun `When success state show astronomic events`(): Unit = with(composeTestRule) {
         setContent {
-            HomeContent(
+            HomeScreen(
                 astronomicEvents = eventsUiMock.toImmutableList(),
                 thereIsFavEvents = false,
                 isInitialDataLoading = false,
@@ -90,7 +90,7 @@ class HomeScreenTest {
     fun `When astronomic event clicked listener is called`(): Unit = with(composeTestRule) {
         var clickedEventId = "-1"
         setContent {
-            HomeContent(
+            HomeScreen(
                 astronomicEvents = eventsUiMock.toImmutableList(),
                 thereIsFavEvents = false,
                 isInitialDataLoading = false,
