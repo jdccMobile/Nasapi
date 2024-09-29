@@ -18,8 +18,7 @@ import org.junit.Test
 import java.time.LocalDate
 
 class HomeScreenTest {
-
-    private val eventsUiMock = List(3){
+    private val eventsUiMock = List(3) {
         AstronomicEventUi(
             id = AstronomicEventId(it.toString()),
             title = "Title $it",
@@ -50,7 +49,6 @@ class HomeScreenTest {
         }
         onNodeWithTag(LOADING_INDICATOR_TAG).assertIsDisplayed()
     }
-
 
     @Test
     fun `When error state show error message`(): Unit = with(composeTestRule) {
@@ -97,7 +95,7 @@ class HomeScreenTest {
                 isMoreDataLoading = false,
                 error = null,
                 onLoadMoreItems = {},
-                navigateToDetails = { clickedEventId = it},
+                navigateToDetails = { clickedEventId = it },
                 navigateToFavorites = {},
             )
         }
@@ -105,5 +103,4 @@ class HomeScreenTest {
 
         assertEquals("1", clickedEventId)
     }
-
 }

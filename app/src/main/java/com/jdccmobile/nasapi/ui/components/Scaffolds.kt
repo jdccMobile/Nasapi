@@ -162,7 +162,7 @@ fun DetailsScaffold(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = Color.White,
                         onClick = { onFavoriteFabClicked() },
-                                modifier = Modifier.testTag(FAVORITE_FAB_TAG),
+                        modifier = Modifier.testTag(FAVORITE_FAB_TAG),
                     ) {
                         Icon(imageVector = favoriteFabIcon, contentDescription = null)
                     }
@@ -231,4 +231,3 @@ private fun TopBarWithNavigationScaffoldPreview() {
         TopBarWithNavigationScaffold("Favorites", onBackNavigation = {}) {}
     }
 }
-

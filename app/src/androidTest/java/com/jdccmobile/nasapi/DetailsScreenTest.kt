@@ -17,7 +17,6 @@ import org.junit.Test
 import java.time.LocalDate
 
 class DetailsScreenTest {
-
     private val eventUiMock = AstronomicEventUi(
         id = AstronomicEventId("1"),
         title = "Title 1",
@@ -27,7 +26,6 @@ class DetailsScreenTest {
         isFavorite = false,
         hasImage = false,
     )
-
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -50,7 +48,6 @@ class DetailsScreenTest {
         }
         onNodeWithTag(LOADING_INDICATOR_TAG).assertIsDisplayed()
     }
-
 
     @Test
     fun `When success state show astronomic event details`(): Unit = with(composeTestRule) {
@@ -81,7 +78,7 @@ class DetailsScreenTest {
                 showCameraView = showCameraView,
                 userPhotos = emptyList(),
                 onFavoriteFabClicked = {},
-                onTakePhotoFabClicked = { showCameraView = true},
+                onTakePhotoFabClicked = { showCameraView = true },
                 onSavePhotoTaken = { _, _, _ -> },
                 onDeleteUserPhoto = {},
                 onCloseCamera = {},
@@ -102,7 +99,9 @@ class DetailsScreenTest {
                 isLoading = false,
                 showCameraView = false,
                 userPhotos = emptyList(),
-                onFavoriteFabClicked = { astronomicEvent = astronomicEvent.copy(isFavorite = !astronomicEvent.isFavorite)},
+                onFavoriteFabClicked = {
+                    astronomicEvent = astronomicEvent.copy(isFavorite = !astronomicEvent.isFavorite)
+                },
                 onTakePhotoFabClicked = { },
                 onSavePhotoTaken = { _, _, _ -> },
                 onDeleteUserPhoto = {},
@@ -114,5 +113,4 @@ class DetailsScreenTest {
 
         assertEquals(true, astronomicEvent.isFavorite)
     }
-
 }

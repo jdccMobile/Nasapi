@@ -16,8 +16,7 @@ import org.junit.Test
 import java.time.LocalDate
 
 class FavoritesScreenTest {
-
-    private val eventsUiMock = List(3){
+    private val eventsUiMock = List(3) {
         AstronomicEventUi(
             id = AstronomicEventId(it.toString()),
             title = "Title $it",
@@ -44,7 +43,6 @@ class FavoritesScreenTest {
         }
         onNodeWithTag(LOADING_INDICATOR_TAG).assertIsDisplayed()
     }
-
 
     @Test
     fun `When there are no favorites show alert message`(): Unit = with(composeTestRule) {
@@ -73,13 +71,15 @@ class FavoritesScreenTest {
     }
 
     @Test
-    fun `When favorite astronomic event clicked listener is called`(): Unit = with(composeTestRule) {
+    fun `When favorite astronomic event clicked listener is called`(): Unit = with(
+        composeTestRule,
+    ) {
         var clickedEventId = "-1"
         setContent {
             FavoritesScreen(
                 favoriteEvents = eventsUiMock.toImmutableList(),
                 isDataLoading = false,
-                onFavoriteEventClicked = { clickedEventId = it},
+                onFavoriteEventClicked = { clickedEventId = it },
                 onBackNavigation = {},
             )
         }
@@ -87,5 +87,4 @@ class FavoritesScreenTest {
 
         assertEquals("1", clickedEventId)
     }
-
 }
