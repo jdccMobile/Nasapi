@@ -44,10 +44,6 @@ fun HomeDestination(
 
 @Composable
 private fun HomeScreen(viewModel: HomeViewModel) {
-//    val astronomicalEvents by viewModel.astronomicEvents.collectAsStateWithLifecycle()
-//    val thereIsFavEvents by viewModel.thereIsFavEvents.collectAsStateWithLifecycle()
-//    val isInitialDataLoading by viewModel.isInitialDataLoading.collectAsStateWithLifecycle()
-//    val isMoreDataLoading by viewModel.isMoreDataLoading.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeContent(
@@ -63,7 +59,7 @@ private fun HomeScreen(viewModel: HomeViewModel) {
 }
 
 @Composable
-private fun HomeContent(
+fun HomeContent(
     astronomicEvents: ImmutableList<AstronomicEventUi>,
     thereIsFavEvents: Boolean,
     isInitialDataLoading: Boolean,
