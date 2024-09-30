@@ -14,9 +14,9 @@ This app allows you to discover an astronomical event every day from NASA. You c
 
 | Feature      | Screenshot | Description |
 |--------------|------------|-------------|
-| Home         | ![Home](path_to_home_screenshot) | Discover daily astronomical events and easily access your favorites list from the top bar|
-| Details      | ![Details](path_to_details_screenshot) | Explore the event image in detail and read its description. You can also add your own photos and save the event as a favorite. |
-| Favorites    | ![Favorites](path_to_favorites_screenshot) | **Favorites**: Check all your favorite events and access them quickly |
+| Home         | ![Home](https://github.com/jdccMobile/Nasapi/blob/master/screenshots/home.png) | Discover daily astronomical events and easily access your favorites list from the top bar|
+| Details      | ![Details](https://github.com/jdccMobile/Nasapi/blob/master/screenshots/details.png) | Explore the event image in detail and read its description. You can also add your own photos and save the event as a favorite. |
+| Favorites    | ![Favorites](https://github.com/jdccMobile/Nasapi/blob/master/screenshots/favorites.png) | Check all your favorite events and access them quickly |
 
 ## Architecture
 
