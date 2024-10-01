@@ -28,7 +28,7 @@ The app is modularized into three layers following the Clean Architecture princi
 
 - Domain: The domain layer contains the business logic models, repository interfaces, and use cases. Its responsibility is to define the business logic and models. The domain layer must not depend on the other layers, so changes in the presentation or data layers should not affect the business logic. Additionally, it should not depend on the framework where it is implemented, making it reusable in other contexts.
 
- ![CleanArchitecture]()
+ ![CleanArchitecture](https://github.com/jdccMobile/Nasapi/blob/master/screenshots/clean-architecture.png)
 
 The app follows the MVVM pattern:
 
@@ -38,7 +38,7 @@ The app follows the MVVM pattern:
 
 - Model: Represents the data sources (data sources from the data layer), the models (models and repositories from the domain layer), and the business logic (use cases). When it receives a request from the ViewModel, it performs the corresponding read/write operations and returns the information through the use case.
 
-![MVVM]()
+![MVVM](https://github.com/jdccMobile/Nasapi/blob/master/screenshots/mvvm.png)
 
 
 ## Data sources
