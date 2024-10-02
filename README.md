@@ -8,8 +8,8 @@ This app allows you to discover an astronomical event every day from NASA. You c
 - [Features](#features)
 - [Architecture](#rchitecture)
 - [Data sources](#data-sources)
-  - [API](#api)
-  - [Room](#room)
+  - [Remote](#remote)
+  - [Local](#local)
   - [SSOT](#ssot)
 
 <br>   
