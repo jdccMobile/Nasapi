@@ -107,8 +107,8 @@ For the local data source, the Room library is used to easily work with SQL data
 | **description** | String      | A detailed description of the astronomical event                                          |
 | **date**        | String      | The date in YYYY-MM-DD format when the astronomical event occurred                        |
 | **imageUrl**    | String?     | The URL of the event's image (can be `null` if no image is available)                   |
-| **is_favorite** | Boolean     | Indicates whether the astronomical event has been marked as a favorite by the user (`true/false`) |
-| **has_image**   | Boolean     | Indicates whether the event has an image available (`true/false`)                        |
+| **is_favorite** | Boolean     | Indicates whether the astronomical event has been marked as a favorite by the user |
+| **has_image**   | Boolean     | Indicates whether the event has an image available                         |
 
 <br>
 
