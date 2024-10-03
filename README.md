@@ -42,7 +42,7 @@ The app follows the MVVM pattern:
 
 - View: Represents the UI (UI components from the presentation layer) and captures events that the user may trigger. The view is subscribed to the ViewModel, and every time it emits data, the UI will update accordingly. It also communicates user-generated events to the ViewModel so the corresponding action can be taken.
 
-- ViewModel: Represents the state of the view (ViewModel in the presentation layer) and acts as the intermediary between the view and the model. When it receives an event from the view, it communicates with the model via a use case, and when the data is updated, it notifies the view so it can update the UI.
+- ViewModel: Represents the state of the view (ViewModel in the presentation layer) and acts as an intermediary between the view and the model. When it receives an event from the view, it communicates with the model through a use case, and when data is updated, it notifies the view so that it can update the user interface.
 
 - Model: Represents the data sources (data sources from the data layer), the models (models and repositories from the domain layer), and the business logic (use cases). When it receives a request from the ViewModel, it performs the corresponding read/write operations and returns the information through the use case.
 
@@ -53,7 +53,7 @@ The app follows the MVVM pattern:
 <br>
 
 Benefits of Implementing Clean Architecture and MVVM in Android: 
-- **Separation of Concerns (Modularity)**: : by dividing the app into distinct layers (Presentation, Data, and Domain), each layer has its own responsibilities. This separation makes it easier to manage and maintain the codebase. 
+- **Separation of Concerns (Modularity)**: by dividing the app into distinct layers (Presentation, Data, and Domain), each layer has its own responsibilities. This separation makes it easier to manage and maintain the codebase. 
 - **Testability**: each layer can be tested independently, allowing for easier writing of unit tests. The MVVM pattern facilitates testing by allowing developers to test the ViewModel without requiring the UI to be present. 
 - **Scalability**: as the application grows, new features can be added with minimal impact on existing code. Changes in one layer do not necessarily affect other layers. 
 - **Reusability**: the Domain layer can be reused in different applications or contexts without being dependent on the Presentation or Data layers. This improves the maintainability of the code. 
@@ -66,7 +66,7 @@ Benefits of Implementing Clean Architecture and MVVM in Android:
 ## Data sources
 
 ### Remote
-For the remote data source, the [NASA's APOD (Astronomy Picture of the Day) API](https://api.nasa.gov/) is used . This API returns images along with associated metadata such as the date, title, description, images, and other details.
+For the remote data source, the [NASA's APOD (Astronomy Picture of the Day) API](https://api.nasa.gov/) is used. This API returns images along with associated metadata such as the date, title, description, images, and other details.
 
 | **Parameter** | **Type**           | **Default** | **Description** |
 |----------------------|--------------------|-----------------------|-----------------|
