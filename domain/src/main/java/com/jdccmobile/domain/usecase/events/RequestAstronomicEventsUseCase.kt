@@ -12,7 +12,5 @@ class RequestAstronomicEventsUseCase(
         startDate: String,
         endDate: String,
     ): Either<MyError, Unit> =
-        either {
-            astronomicEventRepository.requestAstronomicEvents(startDate, endDate)
-        }
+        either { astronomicEventRepository.requestAstronomicEvents(startDate, endDate).bind() }
 }
