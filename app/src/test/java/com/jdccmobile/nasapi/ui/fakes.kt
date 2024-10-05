@@ -1,17 +1,20 @@
 package com.jdccmobile.nasapi.ui
 
-import android.content.EntityIterator
 import arrow.core.Either
 import com.jdccmobile.domain.model.AstronomicEvent
 import com.jdccmobile.domain.model.AstronomicEventId
+import com.jdccmobile.domain.model.AstronomicEventPhoto
 import com.jdccmobile.domain.model.AstronomicEventPhotoId
 import com.jdccmobile.domain.model.MyError
+import com.jdccmobile.domain.repository.AstronomicEventPhotoRepository
 import com.jdccmobile.domain.repository.AstronomicEventRepository
 import com.jdccmobile.nasapi.ui.model.AstronomicEventPhotoUi
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
+import com.jdccmobile.nasapi.ui.model.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import java.io.File
 import java.time.LocalDate
 
 private val defaultFakeFavoriteEvents = listOf(
@@ -91,6 +94,30 @@ class FakeAstronomicEventRepository : AstronomicEventRepository {
             if (it.id == astronomicEvent.id) updatedEvent else it
         }
         favoriteEventsFlow.value = updatedList
+        return Either.Right(Unit)
+    }
+}
+
+class FakeAstronomicEventPhotoRepository : AstronomicEventPhotoRepository {
+    private val photosFlow = MutableStateFlow(defaultFakeUserPhotosUiMock.map { it.toDomain() })
+
+    override fun photosByEvent(eventId: AstronomicEventId): Flow<List<AstronomicEventPhoto>> {
+        return flowOf(photosFlow.value.filter { it.eventId == eventId })
+    }
+
+    override suspend fun insertPhoto(
+        photo: AstronomicEventPhoto, file: File, imageToSave: ByteArray
+    ): Either<MyError, Unit> {
+        val updatedList = photosFlow.value.toMutableList().apply {
+            add(photo)
+        }
+        photosFlow.value = updatedList
+        return Either.Right(Unit)
+    }
+
+    override suspend fun deletePhoto(photo: AstronomicEventPhoto): Either<MyError, Unit> {
+        val updatedList = photosFlow.value.filterNot { it.photoId == photo.photoId }
+        photosFlow.value = updatedList
         return Either.Right(Unit)
     }
 }
