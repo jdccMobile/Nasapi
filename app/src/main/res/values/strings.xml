@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Nasapi</string>
+    <string name="favorites">Favorites</string>
+    <string name="there_are_no_photos">There are no photos</string>
+    <string name="my_photos">My photos</string>
+    <string name="camera_permission_denied">Camera permission denied</string>
 </resources>
