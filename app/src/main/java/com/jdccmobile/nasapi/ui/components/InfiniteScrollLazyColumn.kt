@@ -1,6 +1,5 @@
 package com.jdccmobile.nasapi.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,6 @@ fun InfiniteScrollLazyColumn(
     modifier: Modifier = Modifier,
 ) {
     val errorLoadingData = error != null && error.type == LoadingType.LoadingMoreData
-    Log.i("asd", errorLoadingData.toString())
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier

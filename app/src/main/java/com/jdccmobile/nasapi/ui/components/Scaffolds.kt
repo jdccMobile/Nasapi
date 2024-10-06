@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -149,6 +150,7 @@ fun DetailsScaffold(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = Color.White,
                         onClick = { onTakePhotoFabClicked() },
+                        modifier = Modifier.testTag(CAMERA_FAB_TAG),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_add_a_photo),
@@ -160,6 +162,7 @@ fun DetailsScaffold(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = Color.White,
                         onClick = { onFavoriteFabClicked() },
+                        modifier = Modifier.testTag(FAVORITE_FAB_TAG),
                     ) {
                         Icon(imageVector = favoriteFabIcon, contentDescription = null)
                     }
@@ -209,6 +212,9 @@ fun ActionIconButton(
         )
     }
 }
+
+const val CAMERA_FAB_TAG = "cameraFabTag"
+const val FAVORITE_FAB_TAG = "favoriteFabTag"
 
 @Preview
 @Composable

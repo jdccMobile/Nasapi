@@ -5,31 +5,31 @@ import androidx.lifecycle.viewModelScope
 import com.jdccmobile.domain.usecase.events.GetFavoriteAstronomicEventsUseCase
 import com.jdccmobile.nasapi.ui.model.AstronomicEventUi
 import com.jdccmobile.nasapi.ui.model.toUi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class FavoritesViewModel(
     private val screenActions: FavoritesScreenActions,
     getFavoriteAstronomicEventsUseCase: GetFavoriteAstronomicEventsUseCase,
 ) : ViewModel() {
-    private val _isDataLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isDataLoading: StateFlow<Boolean> = _isDataLoading.asStateFlow()
+    private val _uiState = MutableStateFlow(
+        UiState(
+            loading = true,
+            favoriteEvents = emptyList(),
+        ),
+    )
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    val favoriteEvents: StateFlow<List<AstronomicEventUi>> =
-        getFavoriteAstronomicEventsUseCase()
-            .mapLatest {
-                _isDataLoading.value = false
-                it.toUi()
+    init {
+        viewModelScope.launch {
+            getFavoriteAstronomicEventsUseCase().collect { events ->
+                _uiState.update { UiState(loading = false, favoriteEvents = events.toUi()) }
             }
-            .onStart { _isDataLoading.value = true }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+        }
+    }
 
     fun onFavoriteEventClicked(astronomicEventId: String) {
         screenActions.onNavToDetails(astronomicEventId)
@@ -39,6 +39,11 @@ class FavoritesViewModel(
         screenActions.onNavBack()
     }
 }
+
+data class UiState(
+    val loading: Boolean,
+    val favoriteEvents: List<AstronomicEventUi>,
+)
 
 data class FavoritesScreenActions(
     val onNavBack: () -> Unit,

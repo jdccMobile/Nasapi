@@ -50,19 +50,18 @@ fun FavoritesDestination(
 fun FavoritesScreen(
     viewModel: FavoritesViewModel,
 ) {
-    val favoriteEvents by viewModel.favoriteEvents.collectAsStateWithLifecycle()
-    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    FavoritesContent(
-        favoriteEvents = favoriteEvents.toImmutableList(),
-        isDataLoading = isDataLoading,
+    FavoritesScreen(
+        favoriteEvents = uiState.favoriteEvents.toImmutableList(),
+        isDataLoading = uiState.loading,
         onFavoriteEventClicked = viewModel::onFavoriteEventClicked,
         onBackNavigation = viewModel::onNavBack,
     )
 }
 
 @Composable
-private fun FavoritesContent(
+fun FavoritesScreen(
     favoriteEvents: ImmutableList<AstronomicEventUi>,
     isDataLoading: Boolean,
     onFavoriteEventClicked: (String) -> Unit,
@@ -103,7 +102,7 @@ private fun FavoritesContent(
 @Composable
 private fun HomeScreenDestinationPreview() {
     NasapiTheme {
-        FavoritesContent(
+        FavoritesScreen(
             favoriteEvents = listOf(
                 AstronomicEventUi(
                     id = AstronomicEventId("1"),

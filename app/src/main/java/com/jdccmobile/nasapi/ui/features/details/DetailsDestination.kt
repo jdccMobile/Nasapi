@@ -107,16 +107,13 @@ fun DetailsScreen(
     permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
 ) {
     val context = LocalContext.current
-    val astronomicEvent by viewModel.astronomicEvent.collectAsStateWithLifecycle()
-    val isDataLoading by viewModel.isDataLoading.collectAsStateWithLifecycle()
-    val showCameraView by viewModel.showCameraView.collectAsStateWithLifecycle()
-    val userPhotos by viewModel.userPhotos.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    DetailsContent(
-        astronomicEvent = astronomicEvent,
-        isDataLoading = isDataLoading,
-        showCameraView = showCameraView,
-        userPhotos = userPhotos,
+    DetailsScreen(
+        astronomicEvent = uiState.astronomicEvent,
+        isLoading = uiState.isLoading,
+        showCameraView = uiState.showCameraView,
+        userPhotos = uiState.userPhotos,
         onFavoriteFabClicked = viewModel::onSwitchFavStatusClicked,
         onTakePhotoFabClicked = { requestCameraPermission(context, permissionLauncher, viewModel) },
         onSavePhotoTaken = viewModel::onSavePhotoTaken,
@@ -128,9 +125,9 @@ fun DetailsScreen(
 
 @Suppress("MagicNumber", "LongParameterList")
 @Composable
-private fun DetailsContent(
+fun DetailsScreen(
     astronomicEvent: AstronomicEventUi?,
-    isDataLoading: Boolean,
+    isLoading: Boolean,
     showCameraView: Boolean,
     userPhotos: List<AstronomicEventPhotoUi>,
     onFavoriteFabClicked: () -> Unit,
@@ -152,7 +149,7 @@ private fun DetailsContent(
         onTakePhotoFabClicked = onTakePhotoFabClicked,
         onBackNavigation = onBackNavigation,
     ) {
-        if (isDataLoading) {
+        if (isLoading) {
             CircularProgressBar()
         } else {
             if (showCameraView) {
@@ -333,7 +330,7 @@ private fun getFavoriteFabIcon(astronomicEvent: AstronomicEventUi?) =
 @Composable
 private fun HomeScreenDestinationPreview() {
     NasapiTheme {
-        DetailsContent(
+        DetailsScreen(
             astronomicEvent = AstronomicEventUi(
                 id = AstronomicEventId("1"),
                 title = "Prueba",
@@ -343,7 +340,7 @@ private fun HomeScreenDestinationPreview() {
                 isFavorite = false,
                 hasImage = false,
             ),
-            isDataLoading = false,
+            isLoading = false,
             showCameraView = false,
             onFavoriteFabClicked = {},
             onTakePhotoFabClicked = {},

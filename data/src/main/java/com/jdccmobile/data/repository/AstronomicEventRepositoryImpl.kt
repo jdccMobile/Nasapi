@@ -45,5 +45,5 @@ class AstronomicEventRepositoryImpl(
     ): Either<MyError, Unit> = localDataSource.switchFavoriteStatus(astronomicEvent)
 }
 
-private const val EVENTS_IN_WEEK = 7
-private const val NO_EVENTS_IN_WEEK = 0
+const val EVENTS_IN_WEEK = 7
+const val NO_EVENTS_IN_WEEK = 0
