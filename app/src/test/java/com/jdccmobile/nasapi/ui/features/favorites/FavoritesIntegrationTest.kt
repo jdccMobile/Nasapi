@@ -9,7 +9,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -18,8 +17,9 @@ import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class FavoritesIntegrationTests {
+class FavoritesIntegrationTest {
     private val testDispatcher = StandardTestDispatcher()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -29,6 +29,7 @@ class FavoritesIntegrationTests {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
     @Test
     fun `data is loaded from repository when view model is initialized`() = runTest {
         val repository = FakeAstronomicEventRepository()
@@ -37,7 +38,13 @@ class FavoritesIntegrationTests {
 
         vm.uiState.test {
             Assert.assertEquals(UiState(loading = true, favoriteEvents = emptyList()), awaitItem())
-            Assert.assertEquals(UiState(loading = false, favoriteEvents = repository.favoriteAstronomicEvents.first().toUi()), awaitItem())
+            Assert.assertEquals(
+                UiState(
+                    loading = false,
+                    favoriteEvents = repository.favoriteAstronomicEvents.first().toUi(),
+                ),
+                awaitItem(),
+            )
             cancel()
         }
     }
@@ -47,7 +54,7 @@ class FavoritesIntegrationTests {
         var clickedEventId: String? = null
         val actions = FavoritesScreenActions(
             onNavBack = {},
-            onNavToDetails = { eventId -> clickedEventId = eventId }
+            onNavToDetails = { eventId -> clickedEventId = eventId },
         )
         val repository = FakeAstronomicEventRepository()
         val vm = buildViewModelWith(repository, actions)
@@ -60,7 +67,7 @@ class FavoritesIntegrationTests {
 
     private fun buildViewModelWith(
         repository: FakeAstronomicEventRepository,
-        screenActions: FavoritesScreenActions = defaultScreenActions()
+        screenActions: FavoritesScreenActions = defaultScreenActions(),
     ): FavoritesViewModel {
         val getFavoriteEventsUseCase = GetFavoriteAstronomicEventsUseCase(repository)
         return FavoritesViewModel(screenActions, getFavoriteEventsUseCase)
@@ -68,6 +75,6 @@ class FavoritesIntegrationTests {
 
     private fun defaultScreenActions() = FavoritesScreenActions(
         onNavBack = {},
-        onNavToDetails = {}
+        onNavToDetails = {},
     )
 }

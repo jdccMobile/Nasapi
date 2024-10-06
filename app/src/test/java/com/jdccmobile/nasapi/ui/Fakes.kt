@@ -38,13 +38,6 @@ private val defaultFakeFavoriteEvents = listOf(
     ),
 )
 
-private val defaultFakeUserPhotoUiMock =
-    AstronomicEventPhotoUi(
-        photoId = AstronomicEventPhotoId("1"),
-        eventId = AstronomicEventId("1"),
-        filePath = "path",
-    )
-
 private val defaultFakeUserPhotosUiMock = List(3) {
     AstronomicEventPhotoUi(
         photoId = AstronomicEventPhotoId(it.toString()),
@@ -53,45 +46,31 @@ private val defaultFakeUserPhotosUiMock = List(3) {
     )
 }
 
-private val defaultFakeFavoriteEventsUi = listOf(
-    AstronomicEventUi(
-        id = AstronomicEventId("1"),
-        title = "Prueba",
-        description = "Descripcion",
-        date = LocalDate.now(),
-        imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
-        isFavorite = false,
-        hasImage = false,
-    ),
-    AstronomicEventUi(
-        id = AstronomicEventId("2"),
-        title = "Prueba",
-        description = "Descripcion",
-        date = LocalDate.now(),
-        imageUrl = "https://apod.nasa.gov/apod/image/2408/2024MaUrM45.jpg",
-        isFavorite = false,
-        hasImage = false,
-    ),
-)
-
 class FakeAstronomicEventRepository : AstronomicEventRepository {
     private val favoriteEventsFlow = MutableStateFlow(defaultFakeFavoriteEvents)
 
-    override val astronomicEvents: Flow<List<AstronomicEvent>> = favoriteEventsFlow // Asegúrate de usar el flujo aquí
+    override val astronomicEvents: Flow<List<AstronomicEvent>> = favoriteEventsFlow
 
     override val favoriteAstronomicEvents: Flow<List<AstronomicEvent>> = favoriteEventsFlow
 
     override val thereIsFavEvents: Flow<Boolean> = flowOf(favoriteEventsFlow.value.isNotEmpty())
 
-    override fun getAstronomicEventDetails(astronomicEventId: AstronomicEventId): Flow<AstronomicEvent> {
+    override fun getAstronomicEventDetails(
+        astronomicEventId: AstronomicEventId,
+    ): Flow<AstronomicEvent> {
         return flowOf(favoriteEventsFlow.value.first { it.id == astronomicEventId })
     }
 
-    override suspend fun requestAstronomicEvents(startDate: String, endDate: String): Either<MyError, Unit> {
+    override suspend fun requestAstronomicEvents(
+        startDate: String,
+        endDate: String,
+    ): Either<MyError, Unit> {
         return Either.Right(Unit)
     }
 
-    override suspend fun switchFavoriteStatus(astronomicEvent: AstronomicEvent): Either<MyError, Unit> {
+    override suspend fun switchFavoriteStatus(
+        astronomicEvent: AstronomicEvent,
+    ): Either<MyError, Unit> {
         val updatedEvent = astronomicEvent.copy(isFavorite = !astronomicEvent.isFavorite)
         val updatedList = favoriteEventsFlow.value.map {
             if (it.id == astronomicEvent.id) updatedEvent else it
@@ -101,7 +80,6 @@ class FakeAstronomicEventRepository : AstronomicEventRepository {
     }
 }
 
-
 class FakeAstronomicEventPhotoRepository : AstronomicEventPhotoRepository {
     private val photosFlow = MutableStateFlow(defaultFakeUserPhotosUiMock.map { it.toDomain() })
 
@@ -110,7 +88,9 @@ class FakeAstronomicEventPhotoRepository : AstronomicEventPhotoRepository {
     }
 
     override suspend fun insertPhoto(
-        photo: AstronomicEventPhoto, file: File, imageToSave: ByteArray
+        photo: AstronomicEventPhoto,
+        file: File,
+        imageToSave: ByteArray,
     ): Either<MyError, Unit> {
         val updatedList = photosFlow.value.toMutableList().apply {
             add(photo)
@@ -125,5 +105,3 @@ class FakeAstronomicEventPhotoRepository : AstronomicEventPhotoRepository {
         return Either.Right(Unit)
     }
 }
-
-

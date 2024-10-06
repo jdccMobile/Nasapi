@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class HomeIntegrationTests {
+class HomeIntegrationTest {
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -31,7 +31,6 @@ class HomeIntegrationTests {
     fun tearDown() {
         Dispatchers.resetMain()
     }
-
 
     @Test
     fun `data is loaded from repository when view model is initialized without turbine`() = runTest {
@@ -98,7 +97,6 @@ class HomeIntegrationTests {
         vm.onLoadMoreItems()
         runCurrent()
 
-        // Verificar que el estado de carga adicional se ha desactivado tras cargar más datos
         Assert.assertFalse(vm.uiState.value.isMoreDataLoading)
     }
 
@@ -107,7 +105,7 @@ class HomeIntegrationTests {
         var navigatedToEventId: String? = null
         val screenActions = HomeScreenActions(
             navigateToFavorites = {},
-            navigateToDetails = { eventId -> navigatedToEventId = eventId }
+            navigateToDetails = { eventId -> navigatedToEventId = eventId },
         )
 
         val repository = FakeAstronomicEventRepository()
@@ -116,7 +114,6 @@ class HomeIntegrationTests {
         val testEventId = repository.astronomicEvents.first().first().id.value
         vm.onAstronomicEventClicked(testEventId)
 
-        // Verificar que se navegó al evento correcto
         Assert.assertEquals(testEventId, navigatedToEventId)
     }
 
@@ -125,7 +122,7 @@ class HomeIntegrationTests {
         var favoritesClicked = false
         val screenActions = HomeScreenActions(
             navigateToFavorites = { favoritesClicked = true },
-            navigateToDetails = {}
+            navigateToDetails = {},
         )
 
         val repository = FakeAstronomicEventRepository()
@@ -139,7 +136,7 @@ class HomeIntegrationTests {
 
     private fun buildViewModelWith(
         repository: FakeAstronomicEventRepository,
-        screenActions: HomeScreenActions = defaultScreenActions()
+        screenActions: HomeScreenActions = defaultScreenActions(),
     ): HomeViewModel {
         val getEventsUseCase = GetAstronomicEventsUseCase(repository)
         val getFavEventsUseCase = GetIfThereIsFavEventsUseCase(repository)
@@ -149,12 +146,12 @@ class HomeIntegrationTests {
             screenActions = screenActions,
             requestAstronomicEventsUseCase = requestEventsUseCase,
             getAstronomicEventsUseCase = getEventsUseCase,
-            getIfThereIsFavEventsUseCase = getFavEventsUseCase
+            getIfThereIsFavEventsUseCase = getFavEventsUseCase,
         )
     }
 
     private fun defaultScreenActions() = HomeScreenActions(
         navigateToFavorites = {},
-        navigateToDetails = {}
+        navigateToDetails = {},
     )
 }

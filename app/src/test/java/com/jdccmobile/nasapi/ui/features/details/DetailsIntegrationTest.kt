@@ -24,7 +24,7 @@ import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class DetailsIntegrationTests {
+class DetailsIntegrationTest {
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -50,7 +50,9 @@ class DetailsIntegrationTests {
             val firstEvent = repository.favoriteAstronomicEvents.first().first().toUi()
             Assert.assertEquals(firstEvent, awaitItem().astronomicEvent)
 
-            val firstPhoto = photoRepository.photosByEvent(AstronomicEventId("1")).first().map { it.toUi() }
+            val firstPhoto = photoRepository.photosByEvent(
+                AstronomicEventId("1"),
+            ).first().map { it.toUi() }
             Assert.assertEquals(firstPhoto, awaitItem().userPhotos)
 
             cancel()
@@ -76,7 +78,7 @@ class DetailsIntegrationTests {
     private fun buildViewModelWith(
         repository: FakeAstronomicEventRepository,
         photoRepository: FakeAstronomicEventPhotoRepository,
-        screenActions: DetailsScreenActions = defaultScreenActions()
+        screenActions: DetailsScreenActions = defaultScreenActions(),
     ): DetailsViewModel {
         val getEventUseCase = GetAstronomicEventUseCase(repository)
         val getPhotosUseCase = GetPhotosByEventUseCase(photoRepository)
@@ -91,11 +93,11 @@ class DetailsIntegrationTests {
             getPhotosByEventUseCase = getPhotosUseCase,
             switchEventFavoriteStatusUseCase = switchFavoriteUseCase,
             insertPhotoUseCase = insertPhotoUseCase,
-            deletePhotoUseCase = deletePhotoUseCase
+            deletePhotoUseCase = deletePhotoUseCase,
         )
     }
 
     private fun defaultScreenActions() = DetailsScreenActions(
-        onNavBack = {}
+        onNavBack = {},
     )
 }
