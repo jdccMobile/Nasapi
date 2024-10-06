@@ -38,7 +38,8 @@ class HomeViewModel(
         requestInitialEvents()
         viewModelScope.launch {
             getAstronomicEventsUseCase().collect { events ->
-                _uiState.update { it.copy(astronomicEvents = events.toUi().toSet()) }
+                _uiState.update { it.copy(astronomicEvents = events.toUi().toSet(), isInitialDataLoading = false)
+                }
             }
         }
         viewModelScope.launch {
